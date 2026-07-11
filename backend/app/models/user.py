@@ -50,6 +50,13 @@ class User(Base):
         default=UserRole.CUSTOMER
     )
 
+    # Superuser Flag (Replaces .env email checking)
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="false"
+    )
+
     # Identity Provider Source (e.g., "google")
     provider: Mapped[str] = mapped_column(String(50), default="google")
 

@@ -79,3 +79,25 @@ def get_current_user(
         raise HTTPException(status_code=400, detail="Inactive user")
         
     return user
+
+def require_superuser(
+    current_user: User = Depends(get_current_user)
+) -> User:
+    """
+    Dependency to enforce that the current user is a super administrator.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Superuser privileges required"
+        )
+    return current_user
+
+def require_customer(
+    current_user: User = Depends(get_current_user)
+) -> User:
+    """
+    Future dependency: enforce that the current user is a customer or higher.
+    """
+    # Assuming all valid users have at least customer privileges for now
+    return current_user

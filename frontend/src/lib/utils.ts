@@ -52,22 +52,22 @@ export function getStatusColor(status: string): string {
     case 'healthy':
     case 'success':
     case 'deployed':
-      return 'text-emerald-400'
+      return 'text-[var(--success)]'
     case 'pending':
     case 'deploying':
     case 'building':
     case 'warning':
-      return 'text-amber-400'
+      return 'text-[var(--warning)]'
     case 'error':
     case 'failed':
     case 'critical':
     case 'stopped':
-      return 'text-red-400'
+      return 'text-[var(--error)]'
     case 'idle':
     case 'paused':
-      return 'text-slate-400'
+      return 'text-[var(--text-tertiary)]'
     default:
-      return 'text-slate-400'
+      return 'text-[var(--text-tertiary)]'
   }
 }
 
@@ -78,21 +78,21 @@ export function getStatusBg(status: string): string {
     case 'healthy':
     case 'success':
     case 'deployed':
-      return 'bg-emerald-500/10'
+      return 'bg-[var(--success-light)]'
     case 'pending':
     case 'deploying':
     case 'building':
     case 'warning':
-      return 'bg-amber-500/10'
+      return 'bg-[var(--warning-light)]'
     case 'error':
     case 'failed':
     case 'critical':
     case 'stopped':
-      return 'bg-red-500/10'
+      return 'bg-[var(--error-light)]'
     case 'idle':
     case 'paused':
-      return 'bg-slate-500/10'
+      return 'bg-[var(--info-light)]'
     default:
-      return 'bg-slate-500/10'
+      return 'bg-[var(--info-light)]'
   }
 }

@@ -14,8 +14,8 @@ export function MetricBar({ label, value, max = 100, unit = '%', className }: Me
   return (
     <div className={cn('space-y-1.5', className)}>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-400">{label}</span>
-        <span className="text-xs font-medium text-slate-300">{value}{unit}</span>
+        <span className="text-xs text-[var(--text-tertiary)]">{label}</span>
+        <span className="text-xs font-medium text-[var(--text-secondary)]">{value}{unit}</span>
       </div>
       <Progress value={percentage} className="h-1.5" />
     </div>

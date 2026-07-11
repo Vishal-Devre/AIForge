@@ -4,21 +4,21 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-950 disabled:pointer-events-none disabled:opacity-50 select-none',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer',
   {
     variants: {
       variant: {
-        default: 'bg-primary-500 text-white hover:bg-primary-600 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 active:scale-[0.98]',
-        destructive: 'bg-red-500/90 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 active:scale-[0.98]',
-        outline: 'border border-primary-500/20 bg-transparent text-slate-300 hover:bg-primary-500/10 hover:border-primary-500/40 hover:text-white active:scale-[0.98]',
-        secondary: 'bg-surface-800 text-slate-200 hover:bg-surface-700 border border-surface-700/50 active:scale-[0.98]',
-        ghost: 'text-slate-400 hover:text-white hover:bg-surface-800/80 active:scale-[0.98]',
-        link: 'text-primary-400 underline-offset-4 hover:underline hover:text-primary-300',
+        default: 'bg-[var(--accent)] text-[var(--text-on-accent)] hover:bg-[var(--accent-hover)] shadow-[var(--shadow-accent)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.02] active:scale-[0.98]',
+        destructive: 'bg-[var(--error)] text-[var(--text-on-accent)] hover:bg-[var(--error-hover)] shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.02] active:scale-[0.98]',
+        outline: 'border border-[var(--border-accent)] bg-transparent text-[var(--text-secondary)] hover:bg-[var(--accent-light)] hover:border-[var(--border-focus)] hover:text-[var(--text-primary)] active:scale-[0.98]',
+        secondary: 'bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:bg-[var(--border-primary)] border border-[var(--border-primary)] hover:border-[var(--border-strong)] active:scale-[0.98]',
+        ghost: 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] active:scale-[0.98]',
+        link: 'text-[var(--text-accent)] underline-offset-4 hover:underline hover:text-[var(--accent-hover)]',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-12 rounded-xl px-6 text-base',
+        default: 'h-10 px-5 py-2.5',
+        sm: 'h-8 rounded-md px-3.5 text-xs',
+        lg: 'h-12 rounded-xl px-7 text-base',
         xl: 'h-14 rounded-xl px-8 text-lg',
         icon: 'h-10 w-10',
         'icon-sm': 'h-8 w-8',

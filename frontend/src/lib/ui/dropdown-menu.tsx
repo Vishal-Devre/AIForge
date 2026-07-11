@@ -18,7 +18,7 @@ const DropdownMenuContent = forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 min-w-[12rem] overflow-hidden rounded-xl border border-surface-700/50 bg-surface-900/95 backdrop-blur-xl p-1.5 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        'z-50 min-w-[12rem] overflow-hidden rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] backdrop-blur-xl p-1.5 shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         className,
       )}
       {...props}
@@ -34,7 +34,7 @@ const DropdownMenuItem = forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 outline-none transition-colors focus:bg-surface-800 focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-secondary)] outline-none transition-colors focus:bg-[var(--bg-tertiary)] focus:text-[var(--text-primary)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
       className,
     )}
@@ -49,7 +49,7 @@ const DropdownMenuSeparator = forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn('-mx-1 my-1.5 h-px bg-surface-700/50', className)}
+    className={cn('-mx-1 my-1.5 h-px bg-[var(--border-primary)]', className)}
     {...props}
   />
 ))
@@ -61,7 +61,7 @@ const DropdownMenuLabel = forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn('px-3 py-2 text-sm font-medium text-white', inset && 'pl-8', className)}
+    className={cn('px-3 py-2 text-sm font-medium text-[var(--text-primary)]', inset && 'pl-8', className)}
     {...props}
   />
 ))

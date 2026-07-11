@@ -60,17 +60,17 @@ const icons = {
 }
 
 const colors = {
-  success: 'border-emerald-500/30 bg-emerald-500/10',
-  error: 'border-red-500/30 bg-red-500/10',
-  warning: 'border-amber-500/30 bg-amber-500/10',
-  info: 'border-blue-500/30 bg-blue-500/10',
+  success: 'border-[var(--success-border)] bg-[var(--success-light)]',
+  error: 'border-[var(--error-border)] bg-[var(--error-light)]',
+  warning: 'border-[var(--warning-border)] bg-[var(--warning-light)]',
+  info: 'border-[var(--info-border)] bg-[var(--info-light)]',
 }
 
 const iconColors = {
-  success: 'text-emerald-400',
-  error: 'text-red-400',
-  warning: 'text-amber-400',
-  info: 'text-blue-400',
+  success: 'text-[var(--success)]',
+  error: 'text-[var(--error)]',
+  warning: 'text-[var(--warning)]',
+  info: 'text-[var(--info)]',
 }
 
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
@@ -84,12 +84,12 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     >
       <Icon className={cn('h-5 w-5 mt-0.5 shrink-0', iconColors[toast.type])} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white">{toast.title}</p>
+        <p className="text-sm font-medium text-[var(--text-primary)]">{toast.title}</p>
         {toast.message && (
-          <p className="text-xs text-slate-400 mt-0.5">{toast.message}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{toast.message}</p>
         )}
       </div>
-      <button onClick={onClose} className="shrink-0 text-slate-500 hover:text-white transition-colors">
+      <button onClick={onClose} className="shrink-0 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
         <X className="h-4 w-4" />
       </button>
     </div>

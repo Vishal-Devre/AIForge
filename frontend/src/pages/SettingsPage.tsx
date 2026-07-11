@@ -52,8 +52,8 @@ export function SettingsPage() {
                   onClick={() => setActiveSection(s.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     activeSection === s.id
-                      ? 'text-white bg-primary-500/15 border border-primary-500/20'
-                      : 'text-slate-400 hover:text-white hover:bg-surface-800/60 border border-transparent'
+                      ? 'text-[var(--text-primary)] bg-[var(--accent-light)] border border-[var(--border-accent)]'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] border border-transparent'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -77,28 +77,28 @@ export function SettingsPage() {
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-white">Theme</p>
-                      <p className="text-xs text-slate-400">Toggle between dark and light mode</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">Theme</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Toggle between dark and light mode</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Sun className={`h-4 w-4 ${theme === 'light' ? 'text-amber-400' : 'text-slate-500'}`} />
+                      <Sun className={`h-4 w-4 ${theme === 'light' ? 'text-[var(--warning)]' : 'text-[var(--text-tertiary)]'}`} />
                       <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
-                      <Moon className={`h-4 w-4 ${theme === 'dark' ? 'text-blue-400' : 'text-slate-500'}`} />
+                      <Moon className={`h-4 w-4 ${theme === 'dark' ? 'text-[var(--info)]' : 'text-[var(--text-tertiary)]'}`} />
                     </div>
                   </div>
 
                   <Separator />
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Platform Name</label>
+                    <label className="text-sm font-medium text-[var(--text-primary)]">Platform Name</label>
                     <Input defaultValue="AIForge" />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Default Region</label>
+                    <label className="text-sm font-medium text-[var(--text-primary)]">Default Region</label>
                     <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                      <select className="w-full h-10 pl-10 pr-4 rounded-lg bg-surface-800/60 border border-surface-700/30 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30 appearance-none">
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
+                      <select className="w-full h-10 pl-10 pr-4 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] appearance-none">
                         <option>us-east-1 (N. Virginia)</option>
                         <option>us-west-2 (Oregon)</option>
                         <option>eu-central-1 (Frankfurt)</option>
@@ -107,7 +107,7 @@ export function SettingsPage() {
                     </div>
                   </div>
 
-                  <Button onClick={handleSave} className={saved ? 'bg-emerald-500' : ''}>
+                  <Button onClick={handleSave} className={saved ? 'bg-[var(--success)]' : ''}>
                     {saved ? 'Saved!' : <><Save className="h-4 w-4" /> Save Changes</>}
                   </Button>
                 </CardContent>
@@ -130,8 +130,8 @@ export function SettingsPage() {
                   ].map(item => (
                     <div key={item.label} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-white">{item.label}</p>
-                        <p className="text-xs text-slate-400">{item.desc}</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)]">{item.label}</p>
+                        <p className="text-xs text-[var(--text-secondary)]">{item.desc}</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
@@ -149,18 +149,18 @@ export function SettingsPage() {
                 <CardContent className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-white">Two-Factor Authentication</p>
-                      <p className="text-xs text-slate-400">Add an extra layer of security</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">Two-Factor Authentication</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Add an extra layer of security</p>
                     </div>
                     <Switch />
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-white">Session Timeout</p>
-                      <p className="text-xs text-slate-400">Auto-logout after inactivity</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">Session Timeout</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Auto-logout after inactivity</p>
                     </div>
-                    <select className="h-9 rounded-lg bg-surface-800/60 border border-surface-700/30 text-sm text-white px-3 focus:outline-none focus:ring-2 focus:ring-primary-500/30">
+                    <select className="h-9 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]">
                       <option>30 minutes</option>
                       <option>1 hour</option>
                       <option>4 hours</option>
@@ -168,7 +168,7 @@ export function SettingsPage() {
                     </select>
                   </div>
                   <Separator />
-                  <Button variant="outline" className="text-red-400 border-red-500/20 hover:bg-red-500/10">Change Password</Button>
+                  <Button variant="outline" className="text-[var(--error)] border-[var(--error-border)] hover:bg-[var(--error-light)]">Change Password</Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -181,22 +181,22 @@ export function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-5">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/30">
-                      <p className="text-xs text-slate-400">Compute Credits</p>
-                      <p className="text-2xl font-bold text-white mt-1">25,000</p>
-                      <p className="text-xs text-slate-500 mt-1">Remaining this month</p>
+                    <div className="p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-primary)]">
+                      <p className="text-xs text-[var(--text-secondary)]">Compute Credits</p>
+                      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">25,000</p>
+                      <p className="text-xs text-[var(--text-tertiary)] mt-1">Remaining this month</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/30">
-                      <p className="text-xs text-slate-400">GPU Credits</p>
-                      <p className="text-2xl font-bold text-white mt-1">1,000</p>
-                      <p className="text-xs text-slate-500 mt-1">Dedicated GPU hours</p>
+                    <div className="p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-primary)]">
+                      <p className="text-xs text-[var(--text-secondary)]">GPU Credits</p>
+                      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">1,000</p>
+                      <p className="text-xs text-[var(--text-tertiary)] mt-1">Dedicated GPU hours</p>
                     </div>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-white">Current Plan</p>
-                      <p className="text-xs text-slate-400">Enterprise Pro</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">Current Plan</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Enterprise Pro</p>
                     </div>
                     <Badge variant="primary">$299/mo</Badge>
                   </div>
@@ -217,11 +217,11 @@ export function SettingsPage() {
                     { name: 'Development Key', key: 'af_pk_test_xxxx...xxxx', created: '1 week ago' },
                     { name: 'CI/CD Pipeline Key', key: 'af_pk_ci_xxxx...xxxx', created: '3 days ago' },
                   ].map(k => (
-                    <div key={k.name} className="flex items-center justify-between p-3 rounded-lg bg-surface-800/30 border border-surface-700/20">
+                    <div key={k.name} className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)]">
                       <div>
-                        <p className="text-sm font-medium text-white">{k.name}</p>
-                        <p className="text-xs text-slate-400 font-mono">{k.key}</p>
-                        <p className="text-[10px] text-slate-500">Created {k.created}</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)]">{k.name}</p>
+                        <p className="text-xs text-[var(--text-secondary)] font-mono">{k.key}</p>
+                        <p className="text-[10px] text-[var(--text-tertiary)]">Created {k.created}</p>
                       </div>
                       <Button variant="ghost" size="sm">Revoke</Button>
                     </div>
@@ -244,18 +244,18 @@ export function SettingsPage() {
                     { name: 'Marcus Kim', email: 'marcus@aiforge.dev', role: 'Developer', status: 'active' },
                     { name: 'Priya Patel', email: 'priya@aiforge.dev', role: 'Viewer', status: 'pending' },
                   ].map(member => (
-                    <div key={member.email} className="flex items-center justify-between p-3 rounded-lg bg-surface-800/30 border border-surface-700/20">
+                    <div key={member.email} className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)]">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-xs font-bold text-white">
+                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center text-xs font-bold text-[var(--text-on-accent)]">
                           {member.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-white">{member.name}</p>
-                          <p className="text-xs text-slate-400">{member.email}</p>
+                          <p className="text-sm font-medium text-[var(--text-primary)]">{member.name}</p>
+                          <p className="text-xs text-[var(--text-secondary)]">{member.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400">{member.role}</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{member.role}</span>
                         <Badge variant={member.status === 'active' ? 'success' : 'warning'} size="sm">{member.status}</Badge>
                       </div>
                     </div>

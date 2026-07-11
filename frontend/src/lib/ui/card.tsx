@@ -6,7 +6,7 @@ const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     <div
       ref={ref}
       className={cn(
-        'rounded-xl border border-surface-700/50 bg-surface-900/50 backdrop-blur-sm shadow-lg transition-all duration-300',
+        'rounded-xl border border-[var(--border-primary)] bg-[var(--surface-card)] backdrop-blur-sm shadow-[var(--shadow-md)] transition-all duration-300',
         className,
       )}
       {...props}
@@ -24,14 +24,14 @@ CardHeader.displayName = 'CardHeader'
 
 const CardTitle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('font-semibold text-base text-white leading-none tracking-tight', className)} {...props} />
+    <div ref={ref} className={cn('font-semibold text-base text-[var(--text-primary)] leading-none tracking-tight', className)} {...props} />
   ),
 )
 CardTitle.displayName = 'CardTitle'
 
 const CardDescription = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('text-sm text-slate-400', className)} {...props} />
+    <div ref={ref} className={cn('text-sm text-[var(--text-secondary)]', className)} {...props} />
   ),
 )
 CardDescription.displayName = 'CardDescription'

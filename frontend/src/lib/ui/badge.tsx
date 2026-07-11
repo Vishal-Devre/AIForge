@@ -6,13 +6,13 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-surface-800 text-slate-300 border border-surface-700/50',
-        success: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-        warning: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-        danger: 'bg-red-500/10 text-red-400 border border-red-500/20',
-        info: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-        primary: 'bg-primary-500/10 text-primary-300 border border-primary-500/20',
-        outline: 'border border-surface-600 text-slate-400',
+        default: 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-primary)]',
+        success: 'bg-[var(--success-light)] text-[var(--success)] border border-[var(--success-border)]',
+        warning: 'bg-[var(--warning-light)] text-[var(--warning)] border border-[var(--warning-border)]',
+        danger: 'bg-[var(--error-light)] text-[var(--error)] border border-[var(--error-border)]',
+        info: 'bg-[var(--info-light)] text-[var(--info)] border border-[var(--info-border)]',
+        primary: 'bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--border-accent)]',
+        outline: 'border border-[var(--border-strong)] text-[var(--text-tertiary)]',
       },
       size: {
         default: 'px-2.5 py-0.5 text-xs',

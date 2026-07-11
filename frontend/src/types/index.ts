@@ -91,12 +91,15 @@ export interface SidebarItem {
 
 export type ThemeMode = 'dark' | 'light'
 
+export type UserRole = 'ADMIN' | 'CUSTOMER' | 'TEAM_MEMBER' | 'ORGANIZATION_OWNER'
+
 export interface UserProfile {
   id: string
   full_name: string
   email: string
   avatar_url?: string
-  role: string
+  role: UserRole
+  is_superuser: boolean
   provider: string
   is_active: boolean
   created_at: string

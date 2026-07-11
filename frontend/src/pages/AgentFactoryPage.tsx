@@ -19,13 +19,6 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { agents } from '@/data/dummy'
 import { formatDuration, getStatusColor } from '@/lib/utils'
 
-const modelColors: Record<string, string> = {
-  'gpt-4o': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  'gpt-4o-mini': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'claude-3-opus': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  'claude-3-haiku': 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-}
-
 export function AgentFactoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<string>('all')
@@ -52,7 +45,7 @@ export function AgentFactoryPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
           <Input
             placeholder="Search agents..."
             value={searchQuery}
@@ -65,8 +58,8 @@ export function AgentFactoryPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all capitalize ${
-                filter === f ? 'bg-primary-500/15 text-primary-300 border border-primary-500/20' : 'text-slate-400 hover:text-white border border-transparent hover:bg-surface-800/40'
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all capitalize cursor-pointer ${
+                filter === f ? 'bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--border-accent)]' : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-transparent hover:bg-[var(--bg-tertiary)]'
               }`}
             >
               {f}
@@ -79,8 +72,8 @@ export function AgentFactoryPage() {
       {filteredAgents.length === 0 ? (
         <EmptyState
           icon={<Bot className="h-8 w-8" />}
-          title="No agents found"
-          description="Create your first AI agent to get started with automated intelligence"
+          title="No agents yet"
+          description="Create your first AI Agent."
           action={<Button><Plus className="h-4 w-4" /> Create Agent</Button>}
         />
       ) : (
@@ -92,19 +85,19 @@ export function AgentFactoryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Card className="group hover:border-primary-500/20 transition-all duration-300 h-full flex flex-col">
+              <Card className="group hover:border-[var(--border-accent)] transition-all duration-300 h-full flex flex-col">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-                        agent.status === 'running' ? 'bg-emerald-500/10' :
-                        agent.status === 'error' ? 'bg-red-500/10' :
-                        agent.status === 'deploying' ? 'bg-amber-500/10' : 'bg-surface-800'
+                        agent.status === 'running' ? 'bg-[var(--success-light)]' :
+                        agent.status === 'error' ? 'bg-[var(--error-light)]' :
+                        agent.status === 'deploying' ? 'bg-[var(--warning-light)]' : 'bg-[var(--bg-muted)]'
                       }`}>
                         <Bot className={`h-5 w-5 ${
-                          agent.status === 'running' ? 'text-emerald-400' :
-                          agent.status === 'error' ? 'text-red-400' :
-                          agent.status === 'deploying' ? 'text-amber-400' : 'text-slate-400'
+                          agent.status === 'running' ? 'text-[var(--success)]' :
+                          agent.status === 'error' ? 'text-[var(--error)]' :
+                          agent.status === 'deploying' ? 'text-[var(--warning)]' : 'text-[var(--text-tertiary)]'
                         }`} />
                       </div>
                       <div>
@@ -123,24 +116,24 @@ export function AgentFactoryPage() {
                         <DropdownMenuItem><Square className="h-4 w-4" /> Stop</DropdownMenuItem>
                         <DropdownMenuItem><ExternalLink className="h-4 w-4" /> View Logs</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-400">Delete</DropdownMenuItem>
+                        <DropdownMenuItem className="text-[var(--error)]">Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
-                  <p className="text-sm text-slate-400 mb-4 flex-1">{agent.description}</p>
+                  <p className="text-sm text-[var(--text-secondary)] mb-4 flex-1">{agent.description}</p>
 
                   <div className="space-y-2.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">GPU Usage</span>
-                      <span className="text-slate-300">{agent.gpuUsage}%</span>
+                      <span className="text-[var(--text-tertiary)]">GPU Usage</span>
+                      <span className="text-[var(--text-secondary)]">{agent.gpuUsage}%</span>
                     </div>
                     <Progress value={agent.gpuUsage} className="h-1.5" />
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Memory</span>
-                      <span className="text-slate-300">{agent.memoryUsage} GB</span>
+                      <span className="text-[var(--text-tertiary)]">Memory</span>
+                      <span className="text-[var(--text-secondary)]">{agent.memoryUsage} GB</span>
                     </div>
                     <Progress value={(agent.memoryUsage / 8) * 100} className="h-1.5" />
                   </div>
@@ -152,7 +145,7 @@ export function AgentFactoryPage() {
                       <StatusIndicator status={agent.status} />
                       <span className={`capitalize ${getStatusColor(agent.status)}`}>{agent.status}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-slate-500">
+                    <div className="flex items-center gap-3 text-[var(--text-tertiary)]">
                       <span className="flex items-center gap-1"><Layers className="h-3 w-3" /> {agent.deployments}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {formatDuration(agent.uptime)}</span>
                     </div>

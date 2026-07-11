@@ -14,7 +14,7 @@ def get_or_create_user(
     """
     Checks if a user exists by ID or email. If they do not exist, creates a new user 
     using the exact UUID provided by Supabase.
-    Automatically assigns the ADMIN role if the email matches ADMIN_EMAIL in settings.
+    Automatically assigns is_superuser=True if the email matches ADMIN_EMAIL in settings.
     """
     # 1. Try to find the user by ID
     user = db.query(User).filter(User.id == id).first()
@@ -27,8 +27,8 @@ def get_or_create_user(
         # Return existing user
         return user
         
-    # User does not exist, determine role based on configuration
-    role = UserRole.ADMIN if email == settings.ADMIN_EMAIL else UserRole.CUSTOMER
+    # User does not exist, check if this email should be a superuser
+    is_superuser = email == settings.ADMIN_EMAIL
     
     # Create new user record ensuring the Supabase Auth ID matches our Database ID
     new_user = User(
@@ -36,7 +36,8 @@ def get_or_create_user(
         email=email,
         full_name=full_name,
         avatar_url=avatar_url,
-        role=role,
+        role=UserRole.CUSTOMER,
+        is_superuser=is_superuser,
         provider=provider
     )
     
