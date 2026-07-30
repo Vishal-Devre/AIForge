@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Bot, Cpu, Terminal, Rocket, Activity, Settings, User,
+  LayoutDashboard, Bot, PlusCircle, LayoutTemplate, Rocket, Terminal,
+  Users, Activity, Cpu, BarChart3, CreditCard, Sliders, User, Settings,
   ChevronLeft, PanelLeftClose, PanelLeft, Zap, LogIn, LogOut, Sun, Moon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -11,7 +12,20 @@ import { useRole } from '@/hooks/useRole'
 import { sidebarItems } from '@/data/dummy'
 
 const iconMap: Record<string, React.ElementType> = {
-  LayoutDashboard, Bot, Cpu, Terminal, Rocket, Activity, Settings, User,
+  LayoutDashboard,
+  Bot,
+  PlusCircle,
+  LayoutTemplate,
+  Rocket,
+  Terminal,
+  Users,
+  Activity,
+  Cpu,
+  BarChart3,
+  CreditCard,
+  Sliders,
+  User,
+  Settings,
 }
 
 export function Sidebar() {
@@ -21,7 +35,7 @@ export function Sidebar() {
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { role, isAdmin } = useRole()
+  const { isAdmin } = useRole()
 
   const handleLogout = async () => {
     try {
@@ -52,6 +66,12 @@ export function Sidebar() {
     return location.pathname.startsWith(path)
   }
 
+  const filteredItems = sidebarItems.filter(item => {
+    if (item.requireSuperuser && !isAdmin) return false
+    if (item.requireCustomerOnly && isAdmin) return false
+    return true
+  })
+
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -72,39 +92,43 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-        {sidebarItems.filter(item => {
-          if (item.requireSuperuser && !isAdmin) return false;
-          if (item.requireCustomer && isAdmin) return false;
-          return true;
-        }).map((item) => {
+        {filteredItems.map((item) => {
           const Icon = iconMap[item.icon] || LayoutDashboard
           const active = isActive(item.path)
+          const showDivider = item.dividerAfter && isAdmin
+
           return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative border cursor-pointer',
-                collapsed && 'justify-center px-2',
-                theme === 'dark'
-                  ? active
-                    ? 'sidebar-btn-active'
-                    : 'sidebar-btn-default'
-                  : active
-                    ? 'text-[var(--text-primary)] bg-[var(--accent-light)] border-[var(--border-accent)] shadow-sm'
-                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] border-transparent'
+            <div key={item.path} className="space-y-1">
+              <button
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative border cursor-pointer',
+                  collapsed && 'justify-center px-2',
+                  theme === 'dark'
+                    ? active
+                      ? 'sidebar-btn-active'
+                      : 'sidebar-btn-default'
+                    : active
+                      ? 'text-[var(--text-primary)] bg-[var(--accent-light)] border-[var(--border-accent)] shadow-sm'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] border-transparent'
+                )}
+                title={collapsed ? item.label : undefined}
+              >
+                <Icon className={cn(
+                  'h-4.5 w-4.5 shrink-0 transition-colors sidebar-icon',
+                  theme !== 'dark' && (active ? 'text-[var(--accent)]' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]')
+                )} />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+                {active && theme !== 'dark' && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[var(--accent)] shadow-sm shadow-[var(--accent-medium)]" />
+                )}
+              </button>
+              {showDivider && (
+                <div className="my-2.5 px-2">
+                  <div className="border-t border-[var(--border-primary)] opacity-50" />
+                </div>
               )}
-              title={collapsed ? item.label : undefined}
-            >
-              <Icon className={cn(
-                'h-4.5 w-4.5 shrink-0 transition-colors sidebar-icon',
-                theme !== 'dark' && (active ? 'text-[var(--accent)]' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]')
-              )} />
-              {!collapsed && <span className="truncate">{item.label}</span>}
-              {active && theme !== 'dark' && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[var(--accent)] shadow-sm shadow-[var(--accent-medium)]" />
-              )}
-            </button>
+            </div>
           )
         })}
       </nav>
@@ -116,7 +140,7 @@ export function Sidebar() {
         collapsed && 'px-2'
       )}>
         {/* Theme Toggle */}
-          <button
+        <button
           onClick={toggleTheme}
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border cursor-pointer',

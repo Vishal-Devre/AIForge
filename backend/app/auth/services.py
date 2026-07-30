@@ -24,7 +24,15 @@ def get_or_create_user(
         user = db.query(User).filter(User.email == email).first()
         
     if user:
-        # Return existing user
+        # Check if this existing user should be upgraded/downgraded based on admin email
+        should_be_superuser = email == settings.ADMIN_EMAIL
+        if user.is_superuser != should_be_superuser:
+            user.is_superuser = should_be_superuser
+            if should_be_superuser:
+                user.role = UserRole.ADMIN
+            db.add(user)
+            db.commit()
+            db.refresh(user)
         return user
         
     # User does not exist, check if this email should be a superuser
@@ -36,7 +44,7 @@ def get_or_create_user(
         email=email,
         full_name=full_name,
         avatar_url=avatar_url,
-        role=UserRole.CUSTOMER,
+        role=UserRole.ADMIN if is_superuser else UserRole.CUSTOMER,
         is_superuser=is_superuser,
         provider=provider
     )

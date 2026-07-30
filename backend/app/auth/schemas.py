@@ -14,6 +14,7 @@ class UserResponse(BaseModel):
     full_name: str
     avatar_url: Optional[str] = None
     role: UserRole
+    is_superuser: bool
     provider: str
     is_active: bool
     created_at: datetime

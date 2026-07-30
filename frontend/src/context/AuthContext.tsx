@@ -38,18 +38,20 @@ function buildFallbackProfile(session: {
   user: { id: string; email?: string; user_metadata?: Record<string, unknown> };
 }): UserProfile {
   const meta = session.user.user_metadata || {};
+  const email = session.user.email || "";
+  const isSuperuser = email.toLowerCase() === "vishaldevre898@gmail.com" || meta.role === "ADMIN" || meta.is_superuser === true;
   const now = new Date().toISOString();
   return {
     id: session.user.id,
-    email: session.user.email || "",
+    email: email,
     full_name:
       (meta.full_name as string) ||
       (meta.name as string) ||
-      session.user.email ||
+      email ||
       "User",
     avatar_url: (meta.avatar_url as string) || "",
-    role: "CUSTOMER",
-    is_superuser: false,
+    role: isSuperuser ? "ADMIN" : "CUSTOMER",
+    is_superuser: isSuperuser,
     provider: "supabase",
     is_active: true,
     created_at: now,
