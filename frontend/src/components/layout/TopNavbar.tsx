@@ -24,7 +24,7 @@ export function TopNavbar() {
               className="h-8 text-xs"
             >
               <LogIn className="h-3.5 w-3.5 mr-1.5" />
-              Login
+              Sign in
             </Button>
           )}
         </div>

@@ -33,31 +33,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-// Build a fallback UserProfile from the Supabase session metadata
-function buildFallbackProfile(session: {
-  user: { id: string; email?: string; user_metadata?: Record<string, unknown> };
-}): UserProfile {
-  const meta = session.user.user_metadata || {};
-  const email = session.user.email || "";
-  const isSuperuser = email.toLowerCase() === "vishaldevre898@gmail.com" || meta.role === "ADMIN" || meta.is_superuser === true;
-  const now = new Date().toISOString();
-  return {
-    id: session.user.id,
-    email: email,
-    full_name:
-      (meta.full_name as string) ||
-      (meta.name as string) ||
-      email ||
-      "User",
-    avatar_url: (meta.avatar_url as string) || "",
-    role: isSuperuser ? "ADMIN" : "CUSTOMER",
-    is_superuser: isSuperuser,
-    provider: "supabase",
-    is_active: true,
-    created_at: now,
-    updated_at: now,
-  };
-}
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -83,8 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
 
+      if (response.status === 401) {
+        // The token is invalid or the user was deleted in Supabase.
+        // We must clear the stale session.
+        console.warn("Backend rejected token (401). Clearing stale session.");
+        await supabase.auth.signOut();
+        setUser(null);
+        setBackendAvailable(true); // The backend itself is online, it just rejected us
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error("Failed to fetch backend profile");
+        throw new Error(`Failed to fetch backend profile: ${response.status} ${response.statusText}`);
       }
 
       const data: UserProfile = await response.json();
@@ -92,11 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setBackendAvailable(true);
     } catch (error) {
       console.warn(
-        "Backend unavailable, using Supabase session as fallback:",
+        "Backend unavailable or network error:",
         error,
       );
-      // Backend is down — still treat the user as authenticated using Supabase session data
-      setUser(buildFallbackProfile(session));
+      // Backend is genuinely down (e.g., connection refused)
+      // We do NOT create a fake authenticated profile anymore.
+      setUser(null);
       setBackendAvailable(false);
     } finally {
       setLoading(false);

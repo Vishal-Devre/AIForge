@@ -1,1 +1,6 @@
-# Empty init file to mark directory as Python package
+from app.schemas.agent import CreateAgentRequest, AgentResponse
+
+__all__ = [
+    "CreateAgentRequest",
+    "AgentResponse",
+]

@@ -11,6 +11,7 @@ import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AgentFactoryPage } from '@/pages/AgentFactoryPage'
 import { AgentsPage } from '@/pages/AgentsPage'
+import { AgentDetailPage } from '@/pages/AgentDetailPage'
 import { GPUPlatformPage } from '@/pages/GPUPlatformPage'
 import { SandboxPage } from '@/pages/SandboxPage'
 import { DeploymentEnginePage } from '@/pages/DeploymentEnginePage'
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="/profile" element={<ProtectedRoute><Shell><ProfilePage /></Shell></ProtectedRoute>} />
               <Route path="/my-agents" element={<ProtectedRoute><Shell><AgentFactoryPage /></Shell></ProtectedRoute>} />
               <Route path="/create-agent" element={<ProtectedRoute><Shell><CreateAgentPage /></Shell></ProtectedRoute>} />
+              <Route path="/agents/:agentId" element={<ProtectedRoute><Shell><AgentDetailPage /></Shell></ProtectedRoute>} />
               <Route path="/templates" element={<ProtectedRoute><Shell><AgentTemplatesPage /></Shell></ProtectedRoute>} />
               <Route path="/my-deployments" element={<ProtectedRoute><Shell><DeploymentEnginePage /></Shell></ProtectedRoute>} />
               <Route path="/billing" element={<ProtectedRoute><Shell><BillingPage /></Shell></ProtectedRoute>} />

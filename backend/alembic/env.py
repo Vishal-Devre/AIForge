@@ -15,6 +15,7 @@ from app.core.config import settings
 
 from app.db.base import Base
 from app.models.user import User  # Ensures Alembic discovers the User model for autogeneration
+from app.models.agent import Agent  # Ensures Alembic discovers the Agent model for autogeneration
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,12 +1,15 @@
 import uuid
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import String, Boolean, DateTime, Enum, func, Uuid
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.agent import Agent
 
 
 class UserRole(str, PyEnum):
@@ -75,3 +78,9 @@ class User(Base):
         server_default=func.now(), 
         onupdate=func.now()
     )
+
+    # ---- ORM Relationships ----
+
+    # Collection of agents owned by this user.
+    # The `agents` attribute provides access to all Agent instances belonging to this user.
+    agents: Mapped[List["Agent"]] = relationship(back_populates="owner", cascade="all, delete-orphan")

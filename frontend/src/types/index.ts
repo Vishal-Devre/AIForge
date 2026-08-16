@@ -1,15 +1,51 @@
+// ---- Backend-matching Agent types ----
+
+export type Provider = 'OPENAI' | 'ANTHROPIC' | 'GOOGLE' | 'GROQ' | 'OLLAMA'
+export type AgentStatus = 'DRAFT' | 'READY' | 'DEPLOYED' | 'ARCHIVED'
+export type Visibility = 'PRIVATE' | 'PUBLIC'
+
 export interface Agent {
   id: string
+  owner_id: string
   name: string
+  description: string | null
+  provider: Provider
   model: string
-  status: 'running' | 'stopped' | 'error' | 'deploying'
-  description: string
-  deployments: number
-  uptime: number
-  lastActive: Date
-  gpuUsage: number
-  memoryUsage: number
-  createdAt: Date
+  system_prompt: string | null
+  temperature: number
+  max_tokens: number | null
+  visibility: Visibility
+  status: AgentStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface AgentCreatePayload {
+  name: string
+  description?: string | null
+  provider?: Provider
+  model: string
+  system_prompt?: string | null
+  temperature?: number
+  max_tokens?: number | null
+  visibility?: Visibility
+}
+
+export interface AgentUpdatePayload {
+  name?: string
+  description?: string | null
+  provider?: Provider
+  model?: string
+  system_prompt?: string | null
+  temperature?: number
+  max_tokens?: number | null
+  visibility?: Visibility
+  status?: AgentStatus
+}
+
+export interface AgentListResponse {
+  items: Agent[]
+  total: number
 }
 
 export interface GPUInstance {
