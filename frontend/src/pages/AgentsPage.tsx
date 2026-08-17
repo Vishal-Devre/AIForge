@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Bot, Plus, Search, MoreHorizontal, ExternalLink, Trash2, Globe,
-  Clock, Star, ArrowUpDown, AlertCircle,
+  Clock, Star, ArrowUpDown, AlertCircle, Edit3,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
@@ -78,10 +78,12 @@ function AgentCard({
   agent,
   index,
   onView,
+  onDelete,
 }: {
   agent: Agent
   index: number
   onView: (id: string) => void
+  onDelete: (agent: Agent) => void
 }) {
   return (
     <motion.div
@@ -123,12 +125,16 @@ function AgentCard({
                 <DropdownMenuItem onClick={e => { e.stopPropagation(); onView(agent.id) }}>
                   <ExternalLink className="h-4 w-4" /> View Details
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />                  <DropdownMenuItem
-                    className="text-[var(--error)]"
-                    onClick={e => { e.stopPropagation(); setDeleteTarget(agent) }}
-                  >
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </DropdownMenuItem>
+                <DropdownMenuItem onClick={e => { e.stopPropagation(); onView(agent.id) }}>
+                  <Edit3 className="h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-[var(--error)]"
+                  onClick={e => { e.stopPropagation(); onDelete(agent) }}
+                >
+                  <Trash2 className="h-4 w-4" /> Delete
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -188,8 +194,8 @@ function MyAgentsTab() {
     try {
       const filter = statusFilter !== 'all' ? statusFilter : undefined
       const result = await agentsApi.getMyAgents(0, 100, filter)
-      setAgents(result.items)
-      setTotal(result.total)
+      setAgents(result?.items || [])
+      setTotal(result?.total || 0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load agents')
     } finally {
@@ -211,7 +217,7 @@ function MyAgentsTab() {
     }
   }
 
-  const filteredAgents = agents.filter(a => {
+  const filteredAgents = (agents || []).filter(a => {
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -349,6 +355,7 @@ function MyAgentsTab() {
                 agent={agent}
                 index={i}
                 onView={id => navigate(`/agents/${id}`)}
+                onDelete={a => setDeleteTarget(a)}
               />
             ))}
           </div>
@@ -373,7 +380,7 @@ function MarketplaceTab() {
       .finally(() => setLoading(false))
   }, [])
 
-  const filteredAgents = agents.filter(a => {
+  const filteredAgents = (agents || []).filter(a => {
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     return (

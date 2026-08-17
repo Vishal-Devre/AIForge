@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
 from app.models.agent import Agent
-from app.schemas.agent import CreateAgentRequest
+from app.schemas.agent import CreateAgentRequest, UpdateAgentRequest
 
 
 def get_agent_by_id(db: Session, agent_id: uuid.UUID) -> Optional[Agent]:
@@ -50,3 +50,27 @@ def create_agent(db: Session, owner_id: uuid.UUID, data: CreateAgentRequest) -> 
     db.refresh(agent)
 
     return agent
+
+
+def update_agent(db: Session, agent: Agent, data: UpdateAgentRequest) -> Agent:
+    """
+    Apply partial updates to an existing agent.
+    Only fields explicitly supplied by the client are updated.
+    Server-managed fields (id, owner_id, status, created_at, updated_at) are never modified here.
+    """
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(agent, field, value)
+
+    db.commit()
+    db.refresh(agent)
+
+    return agent
+
+
+def delete_agent(db: Session, db_agent: Agent) -> None:
+    """
+    Permanently delete an agent from the database.
+    """
+    db.delete(db_agent)
+    db.commit()

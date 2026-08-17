@@ -40,7 +40,6 @@ export interface AgentUpdatePayload {
   temperature?: number
   max_tokens?: number | null
   visibility?: Visibility
-  status?: AgentStatus
 }
 
 export interface AgentListResponse {

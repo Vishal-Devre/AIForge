@@ -122,7 +122,6 @@ export function AgentDetailPage() {
         temperature: formTemperature,
         max_tokens: formMaxTokens || null,
         visibility: formVisibility,
-        status: formStatus,
       })
       setAgent(updated)
       setEditing(false)
@@ -451,16 +450,17 @@ export function AgentDetailPage() {
                 <>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[var(--text-secondary)]">Status</label>
-                    <Select value={formStatus} onValueChange={v => setFormStatus(v as AgentStatus)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(['DRAFT', 'READY', 'DEPLOYED', 'ARCHIVED'] as AgentStatus[]).map(s => (
-                          <SelectItem key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2 h-9 px-3 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-muted)]">
+                      <StatusIndicator status={
+                        formStatus === 'DEPLOYED' ? 'deployed' :
+                        formStatus === 'READY' ? 'pending' :
+                        formStatus === 'ARCHIVED' ? 'stopped' : 'idle'
+                      } />
+                      <span className={`text-sm font-medium capitalize ${statusColors[formStatus]}`}>
+                        {formStatus.toLowerCase()}
+                      </span>
+                      <span className="text-[10px] text-[var(--text-tertiary)] ml-auto">Read-only</span>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--text-secondary)]">Public visibility</span>

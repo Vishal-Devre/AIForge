@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Activity,
@@ -5,13 +6,9 @@ import {
   Bot,
   Rocket,
   ChevronRight,
-  Plus,
   Terminal,
   GitBranch,
-  Layers,
-  Gauge,
   Sparkles,
-  ArrowRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -25,18 +22,31 @@ import { Button } from "@/lib/ui/button";
 import { Badge } from "@/lib/ui/badge";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
-import {
-  agents,
-  gpuInstances,
-  deployments,
-  dashboardStats,
-} from "@/data/dummy";
+import { agentsApi } from "@/lib/api";
+import type { Agent } from "@/types";
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const hasData =
-    agents.length > 0 || deployments.length > 0 || gpuInstances.length > 0;
+  useEffect(() => {
+    agentsApi
+      .getMyAgents(0, 100)
+      .then((res) => setAgents(res?.items || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const agentCount = agents.length;
+  const hasAgents = agentCount > 0;
+
+  const statusColor: Record<string, string> = {
+    DEPLOYED: "success",
+    READY: "info",
+    DRAFT: "default",
+    ARCHIVED: "error",
+  };
 
   return (
     <div className="space-y-8">
@@ -53,9 +63,9 @@ function DashboardPage() {
           transition={{ delay: 0.05 }}
         >
           <StatCard
-            title="Deployments"
-            value={dashboardStats.totalDeployments}
-            icon={<Rocket className="h-5 w-5" />}
+            title="Agents"
+            value={loading ? "—" : agentCount}
+            icon={<Bot className="h-5 w-5" />}
           />
         </motion.div>
         <motion.div
@@ -64,9 +74,9 @@ function DashboardPage() {
           transition={{ delay: 0.1 }}
         >
           <StatCard
-            title="Agents"
-            value={dashboardStats.activeAgents}
-            icon={<Bot className="h-5 w-5" />}
+            title="Deployments"
+            value={0}
+            icon={<Rocket className="h-5 w-5" />}
           />
         </motion.div>
         <motion.div
@@ -76,7 +86,7 @@ function DashboardPage() {
         >
           <StatCard
             title="GPU Nodes"
-            value={dashboardStats.gpuNodes}
+            value={0}
             icon={<Cpu className="h-5 w-5" />}
           />
         </motion.div>
@@ -87,17 +97,13 @@ function DashboardPage() {
         >
           <StatCard
             title="Uptime"
-            value={
-              dashboardStats.uptimePercent > 0
-                ? `${dashboardStats.uptimePercent}%`
-                : "—"
-            }
+            value="—"
             icon={<Activity className="h-5 w-5" />}
           />
         </motion.div>
       </div>
 
-      {!hasData ? (
+      {!hasAgents && !loading ? (
         /* Welcome State */
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -140,7 +146,7 @@ function DashboardPage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Active Agents</CardTitle>
+                  <CardTitle>My Agents</CardTitle>
                   <Button
                     variant="ghost"
                     size="icon-sm"
@@ -151,36 +157,54 @@ function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {agents.filter((a) => a.status === "running").length === 0 ? (
+                {loading ? (
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="h-14 rounded-lg bg-[var(--bg-muted)] animate-pulse"
+                      />
+                    ))}
+                  </div>
+                ) : agents.length === 0 ? (
                   <p className="text-sm text-[var(--text-tertiary)] py-4 text-center">
-                    No running agents
+                    No agents yet
                   </p>
                 ) : (
                   <div className="space-y-2">
-                    {agents
-                      .filter((a) => a.status === "running")
-                      .slice(0, 3)
-                      .map((agent) => (
-                        <div
-                          key={agent.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)]"
-                        >
-                          <div className="h-9 w-9 rounded-lg bg-[var(--accent-light)] border border-[var(--border-accent)] flex items-center justify-center">
-                            <Bot className="h-4.5 w-4.5 text-[var(--accent)]" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[var(--text-primary)]">
-                              {agent.name}
-                            </p>
-                            <p className="text-xs text-[var(--text-tertiary)]">
-                              {agent.model}
-                            </p>
-                          </div>
-                          <Badge variant="success" size="sm">
-                            Running
-                          </Badge>
+                    {agents.slice(0, 5).map((agent) => (
+                      <div
+                        key={agent.id}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] cursor-pointer hover:border-[var(--border-accent)] transition-colors"
+                        onClick={() => navigate(`/agents/${agent.id}`)}
+                      >
+                        <div className="h-9 w-9 rounded-lg bg-[var(--accent-light)] border border-[var(--border-accent)] flex items-center justify-center">
+                          <Bot className="h-4.5 w-4.5 text-[var(--accent)]" />
                         </div>
-                      ))}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                            {agent.name}
+                          </p>
+                          <p className="text-xs text-[var(--text-tertiary)]">
+                            {agent.model}
+                          </p>
+                        </div>
+                        <Badge
+                          variant={(statusColor[agent.status] || "default") as any}
+                          size="sm"
+                        >
+                          {agent.status.toLowerCase()}
+                        </Badge>
+                      </div>
+                    ))}
+                    {agents.length > 5 && (
+                      <button
+                        onClick={() => navigate("/agents")}
+                        className="w-full text-center text-xs text-[var(--accent)] hover:underline py-1 cursor-pointer"
+                      >
+                        View all {agents.length} agents
+                      </button>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -200,41 +224,9 @@ function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {deployments.length === 0 ? (
-                  <p className="text-sm text-[var(--text-tertiary)] py-4 text-center">
-                    No deployments yet
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {deployments.slice(0, 4).map((dep) => (
-                      <div
-                        key={dep.id}
-                        className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors"
-                      >
-                        <div className="h-8 w-8 rounded-lg bg-[var(--success-light)] flex items-center justify-center">
-                          <Rocket className="h-4 w-4 text-[var(--success)]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--text-primary)] truncate">
-                            {dep.name}
-                          </p>
-                          <p className="text-xs text-[var(--text-tertiary)]">
-                            {dep.region}
-                          </p>
-                        </div>
-                        <Badge
-                          variant={
-                            dep.status === "deployed" ? "success" : "warning"
-                          }
-                          size="sm"
-                          className="capitalize"
-                        >
-                          {dep.status}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <p className="text-sm text-[var(--text-tertiary)] py-4 text-center">
+                  No deployments yet
+                </p>
               </CardContent>
             </Card>
           </div>
