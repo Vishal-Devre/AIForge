@@ -78,11 +78,13 @@ function AgentCard({
   agent,
   index,
   onView,
+  onEdit,
   onDelete,
 }: {
   agent: Agent
   index: number
   onView: (id: string) => void
+  onEdit: (id: string) => void
   onDelete: (agent: Agent) => void
 }) {
   return (
@@ -125,7 +127,7 @@ function AgentCard({
                 <DropdownMenuItem onClick={e => { e.stopPropagation(); onView(agent.id) }}>
                   <ExternalLink className="h-4 w-4" /> View Details
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={e => { e.stopPropagation(); onView(agent.id) }}>
+                <DropdownMenuItem onClick={e => { e.stopPropagation(); onEdit(agent.id) }}>
                   <Edit3 className="h-4 w-4" /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -168,6 +170,25 @@ function AgentCard({
               <Clock className="h-3 w-3" />
               <span>{formatDate(agent.updated_at)}</span>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border-primary)]">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={e => { e.stopPropagation(); onEdit(agent.id) }}
+            >
+              <Edit3 className="h-3 w-3 mr-1" /> Edit
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-[var(--text-secondary)]"
+              onClick={e => { e.stopPropagation(); onView(agent.id) }}
+            >
+              <ExternalLink className="h-3 w-3 mr-1" /> View
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -355,6 +376,7 @@ function MyAgentsTab() {
                 agent={agent}
                 index={i}
                 onView={id => navigate(`/agents/${id}`)}
+                onEdit={id => navigate(`/agents/${id}/edit`)}
                 onDelete={a => setDeleteTarget(a)}
               />
             ))}

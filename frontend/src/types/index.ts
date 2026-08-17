@@ -140,3 +140,31 @@ export interface UserProfile {
   created_at: string
   updated_at: string
 }
+
+// ---- Admin User Management types ----
+
+export interface AdminUser {
+  id: string
+  email: string
+  full_name: string
+  avatar_url: string | null
+  role: 'ADMIN' | 'CUSTOMER'
+  is_superuser: boolean
+  provider: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminUserListResponse {
+  items: AdminUser[]
+  total: number
+}
+
+export interface UserStats {
+  total: number
+  admin_count: number
+  superuser_count: number
+  active_count: number
+  inactive_count: number
+}

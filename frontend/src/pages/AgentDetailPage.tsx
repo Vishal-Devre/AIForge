@@ -1,27 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-  Bot, ArrowLeft, Globe, Lock, Clock, Edit3, Trash2, Save, X,
+  Bot, ArrowLeft, Globe, Lock, Clock, Edit3, Trash2,
   Cpu, Layers, FileText, AlertCircle, CheckCircle2,
 } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
 import { Badge } from '@/lib/ui/badge'
-import { Input } from '@/lib/ui/input'
 import { Separator } from '@/lib/ui/separator'
-import { Switch } from '@/lib/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/lib/ui/dialog'
-import {
-  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
-} from '@/lib/ui/tooltip'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { StatusIndicator } from '@/components/shared/StatusIndicator'
 import { agentsApi } from '@/lib/api'
-import type { Agent, AgentStatus, Provider, Visibility } from '@/types'
+import { useToast } from '@/lib/ui/toast'
+import type { Agent, AgentStatus, Provider } from '@/types'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
@@ -31,14 +24,6 @@ const providerLabel: Record<Provider, string> = {
   GOOGLE: 'Google',
   GROQ: 'Groq',
   OLLAMA: 'Ollama',
-}
-
-const providerModels: Record<Provider, string[]> = {
-  OPENAI: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-  ANTHROPIC: ['claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'],
-  GOOGLE: ['gemini-pro', 'gemini-ultra'],
-  GROQ: ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768'],
-  OLLAMA: ['llama3.2:3b', 'llama3.2:1b', 'mistral:7b'],
 }
 
 const statusColors: Record<AgentStatus, string> = {
@@ -70,75 +55,30 @@ function formatDate(iso: string): string {
 export function AgentDetailPage() {
   const { agentId } = useParams<{ agentId: string }>()
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [agent, setAgent] = useState<Agent | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
-  // Edit form state
-  const [formName, setFormName] = useState('')
-  const [formDescription, setFormDescription] = useState('')
-  const [formProvider, setFormProvider] = useState<Provider>('OPENAI')
-  const [formModel, setFormModel] = useState('')
-  const [formSystemPrompt, setFormSystemPrompt] = useState('')
-  const [formTemperature, setFormTemperature] = useState(0.7)
-  const [formMaxTokens, setFormMaxTokens] = useState(4096)
-  const [formVisibility, setFormVisibility] = useState<Visibility>('PRIVATE')
-  const [formStatus, setFormStatus] = useState<AgentStatus>('DRAFT')
 
   useEffect(() => {
     if (!agentId) return
     setLoading(true)
     agentsApi.getById(agentId)
-      .then(data => {
-        setAgent(data)
-        // Populate form
-        setFormName(data.name)
-        setFormDescription(data.description || '')
-        setFormProvider(data.provider)
-        setFormModel(data.model)
-        setFormSystemPrompt(data.system_prompt || '')
-        setFormTemperature(data.temperature)
-        setFormMaxTokens(data.max_tokens || 4096)
-        setFormVisibility(data.visibility)
-        setFormStatus(data.status)
-      })
+      .then(data => setAgent(data))
       .catch(err => setError(err instanceof Error ? err.message : 'Failed to load agent'))
       .finally(() => setLoading(false))
   }, [agentId])
-
-  const handleSave = async () => {
-    if (!agent) return
-    setSaving(true)
-    try {
-      const updated = await agentsApi.update(agent.id, {
-        name: formName,
-        description: formDescription || null,
-        provider: formProvider,
-        model: formModel,
-        system_prompt: formSystemPrompt || null,
-        temperature: formTemperature,
-        max_tokens: formMaxTokens || null,
-        visibility: formVisibility,
-      })
-      setAgent(updated)
-      setEditing(false)
-    } catch (err) {
-      console.error('Failed to update agent:', err)
-    } finally {
-      setSaving(false)
-    }
-  }
 
   const handleDelete = async () => {
     if (!agent) return
     try {
       await agentsApi.delete(agent.id)
+      addToast({ type: 'success', title: 'Agent deleted', message: `${agent.name} was removed.` })
       navigate('/agents')
     } catch (err) {
-      console.error('Failed to delete agent:', err)
+      const message = err instanceof Error ? err.message : 'Failed to delete agent.'
+      addToast({ type: 'error', title: 'Delete failed', message })
     }
   }
 
@@ -221,57 +161,28 @@ export function AgentDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {!editing ? (
-            <>
-              <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-                <Edit3 className="h-4 w-4 mr-1.5" /> Edit
+          <Button variant="outline" size="sm" onClick={() => navigate(`/agents/${agent.id}/edit`)}>
+            <Edit3 className="h-4 w-4 mr-1.5" /> Edit Agent
+          </Button>
+          <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Trash2 className="h-4 w-4 mr-1.5" /> Delete
               </Button>
-              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="h-4 w-4 mr-1.5" /> Delete
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Delete Agent</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to delete <strong>{agent.name}</strong>? This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-                    <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm" onClick={() => {
-                // Reset form to current agent values
-                setFormName(agent.name)
-                setFormDescription(agent.description || '')
-                setFormProvider(agent.provider)
-                setFormModel(agent.model)
-                setFormSystemPrompt(agent.system_prompt || '')
-                setFormTemperature(agent.temperature)
-                setFormMaxTokens(agent.max_tokens || 4096)
-                setFormVisibility(agent.visibility)
-                setFormStatus(agent.status)
-                setEditing(false)
-              }}>
-                <X className="h-4 w-4 mr-1.5" /> Cancel
-              </Button>
-              <Button size="sm" onClick={handleSave} disabled={saving}>
-                {saving ? (
-                  <>Saving...</>
-                ) : (
-                  <><Save className="h-4 w-4 mr-1.5" /> Save</>
-                )}
-              </Button>
-            </>
-          )}
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Agent</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete <strong>{agent.name}</strong>? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -287,52 +198,23 @@ export function AgentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {editing ? (
-                <>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[var(--text-secondary)]">Name</label>
-                    <Input value={formName} onChange={e => setFormName(e.target.value)} placeholder="Agent name" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[var(--text-secondary)]">Description</label>
-                    <textarea
-                      className="w-full min-h-[80px] rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] transition-all resize-y"
-                      value={formDescription}
-                      onChange={e => setFormDescription(e.target.value)}
-                      placeholder="What does this agent do?"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[var(--text-secondary)]">System Prompt</label>
-                    <textarea
-                      className="w-full min-h-[150px] rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 py-2 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] transition-all resize-y"
-                      value={formSystemPrompt}
-                      onChange={e => setFormSystemPrompt(e.target.value)}
-                      placeholder="You are a helpful assistant..."
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <span className="text-xs text-[var(--text-tertiary)]">Name</span>
-                    <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.name}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-[var(--text-tertiary)]">Description</span>
-                    <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-                      {agent.description || <span className="italic">No description</span>}
-                    </p>
-                  </div>
-                  {agent.system_prompt && (
-                    <div>
-                      <span className="text-xs text-[var(--text-tertiary)]">System Prompt</span>
-                      <pre className="mt-1 text-xs text-[var(--text-secondary)] bg-[var(--bg-muted)] rounded-lg p-3 overflow-x-auto whitespace-pre-wrap font-mono">
-                        {agent.system_prompt}
-                      </pre>
-                    </div>
-                  )}
-                </>
+              <div>
+                <span className="text-xs text-[var(--text-tertiary)]">Name</span>
+                <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.name}</p>
+              </div>
+              <div>
+                <span className="text-xs text-[var(--text-tertiary)]">Description</span>
+                <p className="text-sm text-[var(--text-secondary)] mt-0.5">
+                  {agent.description || <span className="italic">No description</span>}
+                </p>
+              </div>
+              {agent.system_prompt && (
+                <div>
+                  <span className="text-xs text-[var(--text-tertiary)]">System Prompt</span>
+                  <pre className="mt-1 text-xs text-[var(--text-secondary)] bg-[var(--bg-muted)] rounded-lg p-3 overflow-x-auto whitespace-pre-wrap font-mono">
+                    {agent.system_prompt}
+                  </pre>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -346,91 +228,26 @@ export function AgentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {editing ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-[var(--text-secondary)]">Provider</label>
-                      <Select value={formProvider} onValueChange={v => { setFormProvider(v as Provider); setFormModel(providerModels[v as Provider]?.[0] || '') }}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(Object.keys(providerModels) as Provider[]).map(p => (
-                            <SelectItem key={p} value={p}>{providerLabel[p]}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-[var(--text-secondary)]">Model</label>
-                      <Select value={formModel} onValueChange={v => setFormModel(v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {providerModels[formProvider].map(m => (
-                            <SelectItem key={m} value={m}>{m}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-[var(--text-secondary)]">
-                        Temperature <span className="text-[var(--text-tertiary)]">({formTemperature.toFixed(1)})</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="2"
-                        step="0.1"
-                        value={formTemperature}
-                        onChange={e => setFormTemperature(parseFloat(e.target.value))}
-                        className="w-full accent-[var(--accent)]"
-                      />
-                      <div className="flex justify-between text-[10px] text-[var(--text-tertiary)]">
-                        <span>Precise (0.0)</span>
-                        <span>Creative (2.0)</span>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-[var(--text-secondary)]">Max Tokens</label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={1048576}
-                        value={formMaxTokens}
-                        onChange={e => setFormMaxTokens(parseInt(e.target.value) || 4096)}
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-xs text-[var(--text-tertiary)]">Provider</span>
-                      <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{providerLabel[agent.provider]}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-[var(--text-tertiary)]">Model</span>
-                      <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5 font-mono">{agent.model}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-xs text-[var(--text-tertiary)]">Temperature</span>
-                      <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.temperature.toFixed(1)}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-[var(--text-tertiary)]">Max Tokens</span>
-                      <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.max_tokens?.toLocaleString() || 'Not set'}</p>
-                    </div>
-                  </div>
-                </>
-              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-xs text-[var(--text-tertiary)]">Provider</span>
+                  <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{providerLabel[agent.provider]}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-[var(--text-tertiary)]">Model</span>
+                  <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5 font-mono">{agent.model}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-xs text-[var(--text-tertiary)]">Temperature</span>
+                  <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.temperature.toFixed(1)}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-[var(--text-tertiary)]">Max Tokens</span>
+                  <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.max_tokens?.toLocaleString() || 'Not set'}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -446,58 +263,30 @@ export function AgentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {editing ? (
-                <>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[var(--text-secondary)]">Status</label>
-                    <div className="flex items-center gap-2 h-9 px-3 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-muted)]">
-                      <StatusIndicator status={
-                        formStatus === 'DEPLOYED' ? 'deployed' :
-                        formStatus === 'READY' ? 'pending' :
-                        formStatus === 'ARCHIVED' ? 'stopped' : 'idle'
-                      } />
-                      <span className={`text-sm font-medium capitalize ${statusColors[formStatus]}`}>
-                        {formStatus.toLowerCase()}
-                      </span>
-                      <span className="text-[10px] text-[var(--text-tertiary)] ml-auto">Read-only</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-[var(--text-secondary)]">Public visibility</span>
-                    <Switch
-                      checked={formVisibility === 'PUBLIC'}
-                      onCheckedChange={c => setFormVisibility(c ? 'PUBLIC' : 'PRIVATE')}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[var(--text-tertiary)]">Status</span>
-                    <div className="flex items-center gap-1.5">
-                      <StatusIndicator status={
-                        agent.status === 'DEPLOYED' ? 'deployed' :
-                        agent.status === 'READY' ? 'pending' :
-                        agent.status === 'ARCHIVED' ? 'stopped' : 'idle'
-                      } />
-                      <span className={`text-sm font-medium capitalize ${statusColors[agent.status]}`}>
-                        {agent.status.toLowerCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[var(--text-tertiary)]">Visibility</span>
-                    <div className="flex items-center gap-1.5">
-                      {agent.visibility === 'PUBLIC' ? (
-                        <><Globe className="h-3.5 w-3.5 text-[var(--info)]" /><span className="text-sm text-[var(--info)]">Public</span></>
-                      ) : (
-                        <><Lock className="h-3.5 w-3.5 text-[var(--text-tertiary)]" /><span className="text-sm text-[var(--text-tertiary)]">Private</span></>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[var(--text-tertiary)]">Status</span>
+                <div className="flex items-center gap-1.5">
+                  <StatusIndicator status={
+                    agent.status === 'DEPLOYED' ? 'deployed' :
+                    agent.status === 'READY' ? 'pending' :
+                    agent.status === 'ARCHIVED' ? 'stopped' : 'idle'
+                  } />
+                  <span className={`text-sm font-medium capitalize ${statusColors[agent.status]}`}>
+                    {agent.status.toLowerCase()}
+                  </span>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[var(--text-tertiary)]">Visibility</span>
+                <div className="flex items-center gap-1.5">
+                  {agent.visibility === 'PUBLIC' ? (
+                    <><Globe className="h-3.5 w-3.5 text-[var(--info)]" /><span className="text-sm text-[var(--info)]">Public</span></>
+                  ) : (
+                    <><Lock className="h-3.5 w-3.5 text-[var(--text-tertiary)]" /><span className="text-sm text-[var(--text-tertiary)]">Private</span></>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 

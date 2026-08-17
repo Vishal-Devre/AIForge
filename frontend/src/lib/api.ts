@@ -10,6 +10,8 @@ import type {
   AgentCreatePayload,
   AgentUpdatePayload,
   AgentListResponse,
+  AdminUserListResponse,
+  UserStats,
 } from '@/types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -104,5 +106,31 @@ export const agentsApi = {
       headers,
     })
     return handleResponse<void>(response)
+  },
+}
+
+// ─── Admin Users API ──────────────────────────────────────────────────────
+
+export const usersApi = {
+  /** Fetch all users (admin only) */
+  async getAll(
+    search?: string,
+    role?: string,
+  ): Promise<AdminUserListResponse> {
+    const headers = await getAuthHeaders()
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (role && role !== 'ALL') params.set('role', role)
+    const qs = params.toString()
+    const url = `${API_URL}/api/v1/users${qs ? `?${qs}` : ''}`
+    const response = await fetch(url, { headers })
+    return handleResponse<AdminUserListResponse>(response)
+  },
+
+  /** Fetch user statistics (admin only) */
+  async getStats(): Promise<UserStats> {
+    const headers = await getAuthHeaders()
+    const response = await fetch(`${API_URL}/api/v1/users/stats`, { headers })
+    return handleResponse<UserStats>(response)
   },
 }

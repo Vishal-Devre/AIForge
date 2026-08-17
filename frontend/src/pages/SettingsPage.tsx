@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import {
   Settings, Bell, Shield, CreditCard, Key, Users, Globe,
-  Palette, Terminal, HardDrive, ChevronRight, Moon, Sun,
-  Save
+  ChevronRight, Moon, Sun, Save
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
@@ -12,6 +11,7 @@ import { Separator } from '@/lib/ui/separator'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/lib/ui/tabs'
 import { Badge } from '@/lib/ui/badge'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { useTheme } from '@/context/ThemeContext'
 
 const sections = [
@@ -94,19 +94,6 @@ export function SettingsPage() {
                     <Input defaultValue="AIForge" />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--text-primary)]">Default Region</label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-                      <select className="w-full h-10 pl-10 pr-4 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] appearance-none">
-                        <option>us-east-1 (N. Virginia)</option>
-                        <option>us-west-2 (Oregon)</option>
-                        <option>eu-central-1 (Frankfurt)</option>
-                        <option>ap-southeast-1 (Singapore)</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <Button onClick={handleSave} className={saved ? 'bg-[var(--success)]' : ''}>
                     {saved ? 'Saved!' : <><Save className="h-4 w-4" /> Save Changes</>}
                   </Button>
@@ -122,11 +109,9 @@ export function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-5">
                   {[
-                    { label: 'Deployment Notifications', desc: 'When deployments succeed or fail' },
-                    { label: 'GPU Usage Alerts', desc: 'When GPU utilization exceeds thresholds' },
-                    { label: 'Security Alerts', desc: 'When security events are detected' },
-                    { label: 'Billing Alerts', desc: 'When credits are running low' },
-                    { label: 'Weekly Reports', desc: 'Receive weekly usage summaries' },
+                    { label: 'Agent Status Updates', desc: 'When agents change status' },
+                    { label: 'Deployment Health Alerts', desc: 'When deployments succeed or fail' },
+                    { label: 'Billing & Usage Alerts', desc: 'When credits are running low' },
                   ].map(item => (
                     <div key={item.label} className="flex items-center justify-between">
                       <div>
@@ -167,8 +152,6 @@ export function SettingsPage() {
                       <option>Never</option>
                     </select>
                   </div>
-                  <Separator />
-                  <Button variant="outline" className="text-[var(--error)] border-[var(--error-border)] hover:bg-[var(--error-light)]">Change Password</Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -180,27 +163,13 @@ export function SettingsPage() {
                   <CardDescription>Manage your subscription and usage</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-primary)]">
-                      <p className="text-xs text-[var(--text-secondary)]">Compute Credits</p>
-                      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">25,000</p>
-                      <p className="text-xs text-[var(--text-tertiary)] mt-1">Remaining this month</p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-primary)]">
-                      <p className="text-xs text-[var(--text-secondary)]">GPU Credits</p>
-                      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">1,000</p>
-                      <p className="text-xs text-[var(--text-tertiary)] mt-1">Dedicated GPU hours</p>
-                    </div>
-                  </div>
-                  <Separator />
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Current Plan</p>
-                      <p className="text-xs text-[var(--text-secondary)]">Enterprise Pro</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Free Tier</p>
                     </div>
-                    <Badge variant="primary">$299/mo</Badge>
+                    <Badge variant="outline">$0/mo</Badge>
                   </div>
-                  <Button variant="outline">View Billing History</Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -211,22 +180,12 @@ export function SettingsPage() {
                   <CardTitle>API Keys</CardTitle>
                   <CardDescription>Manage API keys for programmatic access</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    { name: 'Production API Key', key: 'af_pk_live_xxxx...xxxx', created: '2 months ago' },
-                    { name: 'Development Key', key: 'af_pk_test_xxxx...xxxx', created: '1 week ago' },
-                    { name: 'CI/CD Pipeline Key', key: 'af_pk_ci_xxxx...xxxx', created: '3 days ago' },
-                  ].map(k => (
-                    <div key={k.name} className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)]">
-                      <div>
-                        <p className="text-sm font-medium text-[var(--text-primary)]">{k.name}</p>
-                        <p className="text-xs text-[var(--text-secondary)] font-mono">{k.key}</p>
-                        <p className="text-[10px] text-[var(--text-tertiary)]">Created {k.created}</p>
-                      </div>
-                      <Button variant="ghost" size="sm">Revoke</Button>
-                    </div>
-                  ))}
-                  <Button variant="outline"><Key className="h-4 w-4" /> Generate New Key</Button>
+                <CardContent>
+                  <EmptyState
+                    icon={<Key className="h-8 w-8" />}
+                    title="No API keys yet"
+                    description="Generate API keys for programmatic access to the platform."
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -237,30 +196,12 @@ export function SettingsPage() {
                   <CardTitle>Team Members</CardTitle>
                   <CardDescription>Manage access for your team</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    { name: 'Alex Rivera', email: 'alex@aiforge.dev', role: 'Admin', status: 'active' },
-                    { name: 'Sarah Chen', email: 'sarah@aiforge.dev', role: 'Developer', status: 'active' },
-                    { name: 'Marcus Kim', email: 'marcus@aiforge.dev', role: 'Developer', status: 'active' },
-                    { name: 'Priya Patel', email: 'priya@aiforge.dev', role: 'Viewer', status: 'pending' },
-                  ].map(member => (
-                    <div key={member.email} className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)]">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center text-xs font-bold text-[var(--text-on-accent)]">
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-[var(--text-primary)]">{member.name}</p>
-                          <p className="text-xs text-[var(--text-secondary)]">{member.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-[var(--text-secondary)]">{member.role}</span>
-                        <Badge variant={member.status === 'active' ? 'success' : 'warning'} size="sm">{member.status}</Badge>
-                      </div>
-                    </div>
-                  ))}
-                  <Button variant="outline"><Users className="h-4 w-4" /> Invite Member</Button>
+                <CardContent>
+                  <EmptyState
+                    icon={<Users className="h-8 w-8" />}
+                    title="No team members yet"
+                    description="Invite team members to collaborate on agents and deployments."
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

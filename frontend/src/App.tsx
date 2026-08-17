@@ -22,6 +22,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { BillingPage } from '@/pages/BillingPage'
 import { AgentTemplatesPage } from '@/pages/AgentTemplatesPage'
 import { CreateAgentPage } from '@/pages/CreateAgentPage'
+import { EditAgentPage } from '@/pages/EditAgentPage'
 import { UserManagementPage } from '@/pages/UserManagementPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { AccountSettingsPage } from '@/pages/AccountSettingsPage'
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/profile" element={<ProtectedRoute><Shell><ProfilePage /></Shell></ProtectedRoute>} />
               <Route path="/my-agents" element={<ProtectedRoute><Shell><AgentFactoryPage /></Shell></ProtectedRoute>} />
               <Route path="/create-agent" element={<ProtectedRoute><Shell><CreateAgentPage /></Shell></ProtectedRoute>} />
+              <Route path="/agents/:agentId/edit" element={<ProtectedRoute><Shell><EditAgentPage /></Shell></ProtectedRoute>} />
               <Route path="/agents/:agentId" element={<ProtectedRoute><Shell><AgentDetailPage /></Shell></ProtectedRoute>} />
               <Route path="/templates" element={<ProtectedRoute><Shell><AgentTemplatesPage /></Shell></ProtectedRoute>} />
               <Route path="/my-deployments" element={<ProtectedRoute><Shell><DeploymentEnginePage /></Shell></ProtectedRoute>} />
