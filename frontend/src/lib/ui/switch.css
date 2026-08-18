@@ -1,0 +1,91 @@
+.uiverse-toggle-root {
+  --active-color: var(--accent); /* Adapted to theme accent */
+  --inactive-color: #d3d3d6;
+
+  position: relative;
+  aspect-ratio: 292 / 142;
+  height: 1.875em;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+.dark .uiverse-toggle-root {
+  --inactive-color: #3f3f46; /* Better contrast for dark mode */
+}
+
+.toggle-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.toggle-background {
+  fill: var(--inactive-color);
+  transition: fill 0.4s;
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-background {
+  fill: var(--active-color);
+}
+
+.toggle-circle-center {
+  transform-origin: center;
+  transition: transform 0.6s;
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-circle-center {
+  transform: translateX(150px);
+}
+
+.toggle-circle {
+  transform-origin: center;
+  transition: transform 0.45s;
+  backface-visibility: hidden;
+}
+
+.toggle-circle.left {
+  transform: scale(1);
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-circle.left {
+  transform: scale(0);
+}
+
+.toggle-circle.right {
+  transform: scale(0);
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-circle.right {
+  transform: scale(1);
+}
+
+.toggle-icon {
+  transition: fill 0.4s;
+}
+
+.toggle-icon.on {
+  fill: var(--inactive-color);
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-icon.on {
+  fill: #fff;
+}
+
+.toggle-icon.off {
+  fill: #eaeaec;
+}
+
+.dark .toggle-icon.off {
+  fill: #18181b;
+}
+
+.uiverse-toggle-root[data-state="checked"] .toggle-icon.off {
+  fill: var(--active-color);
+}

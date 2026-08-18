@@ -1,18 +1,23 @@
 import { useState } from 'react'
 import {
-  Settings, Bell, Shield, CreditCard, Key, Users, Globe,
-  ChevronRight, Moon, Sun, Save
+  Settings, Bell, Shield, CreditCard, Key, Users,
+  ChevronRight, Save, LogOut
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
 import { Input } from '@/lib/ui/input'
 import { Switch } from '@/lib/ui/switch'
 import { Separator } from '@/lib/ui/separator'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/lib/ui/tabs'
+import { Tabs, TabsContent } from '@/lib/ui/tabs'
 import { Badge } from '@/lib/ui/badge'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useTheme } from '@/context/ThemeContext'
+import { useAuth } from '@/context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem
+} from '@/lib/ui/select'
 
 const sections = [
   { id: 'general', label: 'General', icon: Settings },
@@ -25,12 +30,20 @@ const sections = [
 
 export function SettingsPage() {
   const { theme, toggleTheme } = useTheme()
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState('general')
   const [saved, setSaved] = useState(false)
+  const [showPasswordFields, setShowPasswordFields] = useState(false)
 
   const handleSave = () => {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/')
   }
 
   return (
@@ -145,13 +158,49 @@ export function SettingsPage() {
                       <p className="text-sm font-medium text-[var(--text-primary)]">Session Timeout</p>
                       <p className="text-xs text-[var(--text-secondary)]">Auto-logout after inactivity</p>
                     </div>
-                    <select className="h-9 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]">
-                      <option>30 minutes</option>
-                      <option>1 hour</option>
-                      <option>4 hours</option>
-                      <option>Never</option>
-                    </select>
+                    <Select defaultValue="30m">
+                      <SelectTrigger className="w-[160px] h-9 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30m">30 minutes</SelectItem>
+                        <SelectItem value="1h">1 hour</SelectItem>
+                        <SelectItem value="4h">4 hours</SelectItem>
+                        <SelectItem value="never">Never</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">Update Password</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Change your account password</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowPasswordFields(!showPasswordFields)}
+                    >
+                      {showPasswordFields ? 'Cancel' : 'Update'}
+                    </Button>
+                  </div>
+                  {showPasswordFields && (
+                    <div className="space-y-3 pt-2">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-[var(--text-secondary)]">Current Password</label>
+                        <Input type="password" placeholder="Enter current password" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-[var(--text-secondary)]">New Password</label>
+                        <Input type="password" placeholder="Enter new password" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-[var(--text-secondary)]">Confirm New Password</label>
+                        <Input type="password" placeholder="Confirm new password" />
+                      </div>
+                      <Button size="sm" onClick={handleSave}>Save Password</Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -205,6 +254,20 @@ export function SettingsPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {/* Sign Out */}
+            <div className="mt-8 pt-6 border-t border-[var(--border-primary)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Sign Out</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Sign out of your account on this device</p>
+                </div>
+                <Button variant="outline" onClick={handleLogout} className="text-[var(--error)] border-[var(--error-border)] hover:bg-[var(--error-light)] hover:text-[var(--error)]">
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            </div>
           </Tabs>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { Badge } from '@/lib/ui/badge'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { usersApi } from '@/lib/api'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/lib/ui/select'
 import type { AdminUser, UserStats } from '@/types'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -191,15 +192,16 @@ export function UserManagementPage() {
                     />
                   </div>
 
-                  <select
-                    value={roleFilter}
-                    onChange={e => setRoleFilter(e.target.value)}
-                    className="h-9 px-3 rounded-lg bg-[var(--bg-muted)] border border-[var(--border-primary)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)]"
-                  >
-                    <option value="ALL">All Roles</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="CUSTOMER">Customer</option>
-                  </select>
+                  <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-[130px] h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">All Roles</SelectItem>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="CUSTOMER">Customer</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardHeader>

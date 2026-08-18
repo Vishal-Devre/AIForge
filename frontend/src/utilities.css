@@ -1225,6 +1225,9 @@
 }
 
 /* ---- Effects ---- */
+.opacity-0 {
+  opacity: 0;
+}
 .opacity-30 {
   opacity: 0.3;
 }
@@ -1233,6 +1236,9 @@
 }
 .opacity-70 {
   opacity: 0.7;
+}
+.opacity-100 {
+  opacity: 1;
 }
 
 .backdrop-blur-sm {
@@ -1623,6 +1629,18 @@
 }
 .group:hover .group-hover\:border-primary-500\/30 {
   border-color: rgba(245, 158, 11, 0.3);
+}
+.group:hover .group-hover\:opacity-0 {
+  opacity: 0;
+}
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+.group:hover .group-hover\:scale-90 {
+  transform: scale(0.9);
+}
+.group:hover .group-hover\:text-primary {
+  color: var(--text-primary);
 }
 
 /* ---- Pseudo-class ---- */
