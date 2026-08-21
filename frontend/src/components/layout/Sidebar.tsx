@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -19,14 +19,12 @@ import {
   PanelLeft,
   Zap,
   LogIn,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
 import { useRole } from "@/hooks/useRole";
 import { sidebarItems } from "@/data/dummy";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/ui/tooltip";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
@@ -45,15 +43,34 @@ const iconMap: Record<string, React.ElementType> = {
   Settings,
 };
 
+function SidebarTooltip({
+  label,
+  enabled,
+  children,
+}: {
+  label: string;
+  enabled: boolean;
+  children: ReactNode;
+}) {
+  if (!enabled) return <>{children}</>;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="right">{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
   const location = useLocation();
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { isAdmin } = useRole();
 
   // ------------------------------------------------------------
@@ -62,9 +79,9 @@ export function Sidebar() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setCollapsed(true);
-      }
+      const nextIsMobile = window.innerWidth < 768;
+      setIsMobile(nextIsMobile);
+      if (!nextIsMobile) setMobileOpen(false);
     };
 
     handleResize();
@@ -76,10 +93,14 @@ export function Sidebar() {
     };
   }, []);
 
-  // Close mobile sidebar when navigating
   useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
 
   // ------------------------------------------------------------
   // HELPERS
@@ -93,6 +114,11 @@ export function Sidebar() {
     return location.pathname.startsWith(path);
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setMobileOpen(false);
+  };
+
   const filteredItems = sidebarItems.filter((item) => {
     if (item.requireSuperuser && !isAdmin) return false;
     if (item.requireCustomerOnly && isAdmin) return false;
@@ -100,9 +126,10 @@ export function Sidebar() {
     return true;
   });
 
-  const isExpanded = !collapsed;
-
-  const sidebarWidth = isExpanded ? "w-60" : "w-[68px]";
+  const isCompact = !isMobile && desktopCollapsed;
+  const isExpanded = !isCompact;
+  const sidebarWidth = isMobile ? "w-72" : isExpanded ? "w-60" : "w-[68px]";
+  const navSections = ["Workspace", "Administration"] as const;
 
   // ------------------------------------------------------------
   // SIDEBAR CONTENT
@@ -116,15 +143,17 @@ export function Sidebar() {
 
       <div
         className={cn(
-          "relative flex items-center h-[73px] border-b border-[var(--border-primary)]",
-          collapsed ? "justify-center px-3" : "justify-between px-4",
+          "sidebar-header relative flex items-center",
+          isCompact
+            ? "sidebar-header--compact justify-center"
+            : "sidebar-header--expanded justify-between",
         )}
       >
         {/* ====================================================
             COLLAPSED HEADER
             ==================================================== */}
 
-        {collapsed ? (
+        {isCompact ? (
           /* ==================================================
              COLLAPSED HEADER
              --------------------------------------------------
@@ -133,26 +162,25 @@ export function Sidebar() {
              ONLY cross-fades the logo out and reveals the
              expand icon (pure CSS opacity/visibility). The
              sidebar NEVER expands from hover — only a CLICK
-             on this button calls setCollapsed(false).
+             on this button calls setDesktopCollapsed(false).
              ================================================== */
           <button
             type="button"
-            onClick={() => setCollapsed(false)}
+            onClick={() => setDesktopCollapsed(false)}
             className="
+              sidebar-logo-toggle
               group
               relative
               flex
               items-center
               justify-center
-              h-11
-              w-11
+              h-10
+              w-10
               rounded-lg
               cursor-pointer
-              transition-colors
+              transition-all
               duration-200
-              hover:bg-surface-800
               focus:outline-none
-              focus-visible:ring-2
             "
             title="Expand sidebar"
             aria-label="Expand sidebar"
@@ -174,31 +202,26 @@ export function Sidebar() {
             >
               <div
                 className="
+                  sidebar-brand-mark
                   h-9
                   w-9
-                  p-2
-                  rounded-lg
-                  bg-gradient-to-br
-                  from-primary-500
-                  to-primary-700
+                  rounded-xl
                   flex
                   items-center
                   justify-center
-                  shadow-accent
                   shrink-0
                   transition-all
                   duration-200
                   ease-in-out
                   group-hover:scale-90
                 "
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+                  boxShadow: "var(--shadow-accent)",
+                }}
               >
-                <Zap
-                  className="
-                    h-4
-                    w-4
-                    text-primary
-                  "
-                />
+                <Zap className="h-4.5 w-4.5" />
               </div>
             </div>
 
@@ -227,8 +250,9 @@ export function Sidebar() {
             {/* AIForge Branding */}
             <button
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => handleNavigate("/")}
               className="
+                sidebar-brand
                 flex
                 items-center
                 gap-3
@@ -244,50 +268,36 @@ export function Sidebar() {
             >
               <div
                 className="
+                  sidebar-brand-mark
                   h-9
                   w-9
-                  p-2
-                  rounded-lg
-                  bg-gradient-to-br
-                  from-primary-500
-                  to-primary-700
+                  rounded-xl
                   flex
                   items-center
                   justify-center
-                  shadow-accent
                   shrink-0
                   transition-transform
-                  duration-200
+                  duration-300
                   hover:scale-105
                 "
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--accent), var(--accent-hover))",
+                  boxShadow: "var(--shadow-accent)",
+                }}
               >
-                <Zap
-                  className="
-                    h-4
-                    w-4
-                    text-primary
-                  "
-                />
+                <Zap className="h-4.5 w-4.5" />
               </div>
 
               <div className="flex flex-col min-w-0">
                 <span
-                  className="
-                    text-sm
-                    font-bold
-                    text-[var(--text-primary)]
-                    tracking-tight
-                  "
+                  className="sidebar-brand-name text-sm font-bold tracking-tight"
                 >
                   AIForge
                 </span>
 
                 <span
-                  className="
-                    text-[10px]
-                    text-[var(--text-tertiary)]
-                    font-medium
-                  "
+                  className="sidebar-brand-subtitle text-[10px] font-medium"
                 >
                   AI Platform
                 </span>
@@ -297,26 +307,24 @@ export function Sidebar() {
             {/* Collapse Button */}
             <button
               type="button"
-              onClick={() => setCollapsed(true)}
+              onClick={() =>
+                isMobile ? setMobileOpen(false) : setDesktopCollapsed(true)
+              }
               className="
+                sidebar-collapse-button
                 flex
                 items-center
                 justify-center
-                h-8
-                w-8
+                h-10
+                w-10
                 rounded-lg
-                text-[var(--text-tertiary)]
-                hover:text-[var(--text-primary)]
-                hover:bg-[var(--bg-tertiary)]
                 transition-all
                 duration-200
                 cursor-pointer
                 focus:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-[var(--accent)]
               "
-              title="Collapse sidebar"
-              aria-label="Collapse sidebar"
+              title={isMobile ? "Close navigation" : "Collapse sidebar"}
+              aria-label={isMobile ? "Close navigation" : "Collapse sidebar"}
             >
               <PanelLeftClose className="h-5 w-5" />
             </button>
@@ -328,19 +336,30 @@ export function Sidebar() {
           NAVIGATION
           ====================================================== */}
 
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-        {filteredItems.map((item) => {
+      <nav className="flex-1 py-4 px-2 overflow-y-auto" aria-label="Primary navigation">
+        {navSections.map((section) => {
+          const items = filteredItems.filter((item) => item.section === section);
+          if (items.length === 0) return null;
+
+          return (
+            <div key={section} className="mb-5 last:mb-0">
+              {!isCompact && (
+                <p className="sidebar-section-label px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                  {section}
+                </p>
+              )}
+              <div className="space-y-1">
+                {items.map((item) => {
           const Icon = iconMap[item.icon] || LayoutDashboard;
 
           const active = isActive(item.path);
 
-          const showDivider = item.dividerAfter && isAdmin;
-
           return (
             <div key={item.path}>
+              <SidebarTooltip label={item.label} enabled={isCompact}>
               <button
                 type="button"
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigate(item.path)}
                 className={cn(
                   `
                     w-full
@@ -362,24 +381,8 @@ export function Sidebar() {
 
                   !isExpanded && "justify-center px-2",
 
-                  theme === "dark"
-                    ? active
-                      ? "sidebar-btn-active"
-                      : "sidebar-btn-default"
-                    : active
-                      ? `
-                        text-[var(--text-primary)]
-                        bg-[var(--accent-light)]
-                        border-[var(--border-accent)]
-                      `
-                      : `
-                        text-[var(--text-tertiary)]
-                        hover:text-[var(--text-primary)]
-                        hover:bg-[var(--bg-tertiary)]
-                        border-transparent
-                      `,
+                  active ? "sidebar-btn-active" : "sidebar-btn-default",
                 )}
-                title={!isExpanded ? item.label : undefined}
               >
                 <Icon
                   className={cn(
@@ -391,19 +394,12 @@ export function Sidebar() {
                       sidebar-icon
                     `,
 
-                    theme !== "dark" &&
-                      (active
-                        ? "text-[var(--accent)]"
-                        : `
-                            text-[var(--text-tertiary)]
-                            group-hover:text-[var(--text-secondary)]
-                          `),
                   )}
                 />
 
                 {isExpanded && <span className="truncate">{item.label}</span>}
 
-                {active && theme !== "dark" && isExpanded && (
+                {active && isExpanded && (
                   <span
                     className="
                         absolute
@@ -413,25 +409,18 @@ export function Sidebar() {
                         w-0.5
                         h-5
                         rounded-full
-                        bg-[var(--accent)]
+                        bg-accent
                         shadow-sm
-                        shadow-[var(--accent-medium)]
                       "
                   />
                 )}
               </button>
 
-              {showDivider && (
-                <div className="my-2.5 px-2">
-                  <div
-                    className="
-                      border-t
-                      border-[var(--border-primary)]
-                      opacity-50
-                    "
-                  />
-                </div>
-              )}
+              </SidebarTooltip>
+            </div>
+          );
+                })}
+              </div>
             </div>
           );
         })}
@@ -450,90 +439,38 @@ export function Sidebar() {
             space-y-1
           `,
 
-          theme === "dark"
-            ? "sidebar-dark-border"
-            : "border-[var(--border-primary)]",
+          "sidebar-footer",
 
-          collapsed && "px-2",
+          isCompact && "px-2",
         )}
       >
-        {/* ====================================================
-            THEME TOGGLE
-            ==================================================== */}
-
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className={cn(
-            `
-              w-full
-              flex
-              items-center
-              gap-3
-              px-3
-              py-2.5
-              rounded-xl
-              text-sm
-              font-medium
-              transition-all
-              duration-150
-              cursor-pointer
-            `,
-
-            collapsed && "justify-center px-2",
-
-            theme === "dark"
-              ? `
-                text-[#7A7A80]
-                hover:text-white
-                hover:bg-[#1B1B20]
-              `
-              : `
-                text-[var(--text-tertiary)]
-                hover:text-[var(--text-primary)]
-                hover:bg-[var(--bg-tertiary)]
-              `,
-          )}
-          title={
-            !isExpanded
-              ? theme === "dark"
-                ? "Light Mode"
-                : "Dark Mode"
-              : undefined
-          }
-        >
-          {theme === "dark" ? (
-            <Sun
-              className="
-                h-4.5
-                w-4.5
-                shrink-0
-              "
-            />
-          ) : (
-            <Moon
-              className="
-                h-4.5
-                w-4.5
-                shrink-0
-                text-[var(--info)]
-              "
-            />
-          )}
-
-          {isExpanded && (
-            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-          )}
-        </button>
-
         {/* ====================================================
             USER PROFILE
             ==================================================== */}
 
         {isAuthenticated && user ? (
+          <>
+          <SidebarTooltip label="Account settings" enabled={isCompact}>
+            <button
+              type="button"
+              onClick={() => handleNavigate("/account")}
+              className={cn(
+                `
+                  w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                  transition-all duration-200 border cursor-pointer
+                `,
+                isCompact && "justify-center px-2",
+                "sidebar-btn-default",
+              )}
+            >
+              <Settings className="h-4.5 w-4.5 shrink-0 sidebar-icon" />
+              {isExpanded && <span>Account settings</span>}
+            </button>
+          </SidebarTooltip>
+          <SidebarTooltip label="Profile" enabled={isCompact}>
           <button
             type="button"
-            onClick={() => navigate("/profile")}
+            onClick={() => handleNavigate("/profile")}
             className={cn(
               `
                 w-full
@@ -554,33 +491,21 @@ export function Sidebar() {
               `,
 
               !isExpanded && "justify-center px-2",
-
-              theme === "dark"
-                ? "sidebar-btn-default"
-                : `
-                  text-[var(--text-tertiary)]
-                  hover:text-[var(--text-primary)]
-                  hover:bg-[var(--bg-tertiary)]
-                  border-transparent
-                `,
+              "sidebar-btn-default",
             )}
-            title={!isExpanded ? user.full_name : undefined}
           >
             {/* Avatar */}
             <div
               className="
-                h-8
-                w-8
+                sidebar-avatar
+                h-10
+                w-10
                 rounded-full
-                bg-gradient-to-br
-                from-[var(--accent)]
-                to-[var(--accent-hover)]
                 flex
                 items-center
                 justify-center
                 text-xs
                 font-bold
-                text-[var(--text-on-accent)]
                 shrink-0
                 overflow-hidden
               "
@@ -616,9 +541,7 @@ export function Sidebar() {
                       font-medium
                       truncate
                     `,
-                    theme === "dark"
-                      ? "text-white"
-                      : "text-[var(--text-primary)]",
+                    "sidebar-profile-name",
                   )}
                 >
                   {user.full_name}
@@ -630,9 +553,7 @@ export function Sidebar() {
                       text-[10px]
                       truncate
                     `,
-                    theme === "dark"
-                      ? "text-[#7A7A80]"
-                      : "text-[var(--text-tertiary)]",
+                    "sidebar-profile-email",
                   )}
                 >
                   {user.email}
@@ -640,14 +561,17 @@ export function Sidebar() {
               </div>
             )}
           </button>
+          </SidebarTooltip>
+          </>
         ) : (
           /* ==================================================
              SIGN IN
              ================================================== */
 
+          <SidebarTooltip label="Sign in" enabled={isCompact}>
           <button
             type="button"
-            onClick={() => navigate("/login")}
+            onClick={() => handleNavigate("/login")}
             className={cn(
               `
                 w-full
@@ -664,23 +588,10 @@ export function Sidebar() {
                 cursor-pointer
               `,
 
-              collapsed && "justify-center px-2",
+              isCompact && "justify-center px-2",
 
-              theme === "dark"
-                ? `
-                  text-[#7A7A80]
-                  hover:text-white
-                  hover:bg-[#1B1B20]
-                  border-transparent
-                `
-                : `
-                  text-[var(--text-tertiary)]
-                  hover:text-[var(--text-primary)]
-                  hover:bg-[var(--bg-tertiary)]
-                  border-transparent
-                `,
+              "sidebar-btn-default",
             )}
-            title={!isExpanded ? "Sign in" : undefined}
           >
             <div
               className={cn(
@@ -695,27 +606,20 @@ export function Sidebar() {
                   border
                 `,
 
-                theme === "dark"
-                  ? `
-                    bg-[#1B1B20]
-                    border-[#3A3A40]
-                  `
-                  : `
-                    bg-[var(--bg-tertiary)]
-                    border-[var(--border-primary)]
-                  `,
+                "sidebar-sign-in-icon",
               )}
             >
               <LogIn
                 className={cn(
                   "h-4 w-4",
-                  theme === "dark" ? "sidebar-icon" : "",
+                  "sidebar-icon",
                 )}
               />
             </div>
 
             {isExpanded && <span>Sign in</span>}
           </button>
+          </SidebarTooltip>
         )}
       </div>
     </div>
@@ -734,10 +638,10 @@ export function Sidebar() {
       {mobileOpen && (
         <div
           className="
+            sidebar-mobile-overlay
             fixed
             inset-0
             z-40
-            bg-[var(--surface-overlay)]
             backdrop-blur-sm
             md:hidden
           "
@@ -753,6 +657,7 @@ export function Sidebar() {
         type="button"
         onClick={() => setMobileOpen(!mobileOpen)}
         className="
+          sidebar-mobile-toggle
           fixed
           top-2.5
           left-4
@@ -761,18 +666,13 @@ export function Sidebar() {
           h-8
           w-8
           rounded-lg
-          bg-[var(--bg-secondary)]
           border
-          border-[var(--border-primary)]
           flex
           items-center
           justify-center
-          text-[var(--text-primary)]
           shadow-xl
           cursor-pointer
           focus:outline-none
-          focus-visible:ring-2
-          focus-visible:ring-[var(--accent)]
         "
         aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
       >
@@ -804,15 +704,7 @@ export function Sidebar() {
             ease-in-out
           `,
 
-          theme === "dark"
-            ? `
-              sidebar-dark-bg
-              sidebar-dark-border
-            `
-            : `
-              bg-[var(--bg-primary)]
-              border-[var(--border-primary)]
-            `,
+          "sidebar-surface",
 
           sidebarWidth,
 

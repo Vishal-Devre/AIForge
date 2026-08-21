@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Settings, Bell, Shield, CreditCard, Key, Users,
-  ChevronRight, Save, LogOut
+  ChevronRight, Save, LogOut, Sun, Moon
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'

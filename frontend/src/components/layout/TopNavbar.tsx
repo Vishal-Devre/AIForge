@@ -10,7 +10,7 @@ export function TopNavbar() {
 
   return (
     <header className="sticky top-0 z-30 h-12 border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
-      <div className="flex items-center justify-between h-full px-4 md:px-6">
+      <div className="flex items-center justify-between h-full pl-14 pr-4 md:px-6">
         {/* Left: Breadcrumb */}
         <Breadcrumb />
 
