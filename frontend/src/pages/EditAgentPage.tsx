@@ -376,7 +376,7 @@ export function EditAgentPage() {
 
               <Separator />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-[var(--text-secondary)]">
                     Temperature <span className="text-[var(--text-tertiary)]">({formTemperature.toFixed(1)})</span>

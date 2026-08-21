@@ -53,20 +53,20 @@ export function SettingsPage() {
         description="Manage your account and platform preferences"
       />
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="settings-layout flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
         <div className="lg:w-56 shrink-0">
-          <nav className="space-y-1">
+          <nav className="settings-nav space-y-1" aria-label="Settings sections">
             {sections.map(s => {
               const Icon = s.icon
               return (
                 <button
                   key={s.id}
                   onClick={() => setActiveSection(s.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`settings-nav-button w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     activeSection === s.id
-                      ? 'text-[var(--text-primary)] bg-[var(--accent-light)] border border-[var(--border-accent)]'
-                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] border border-transparent'
+                      ? 'settings-nav-button--active'
+                      : ''
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function SettingsPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 max-w-2xl">
+        <div className="settings-content flex-1 max-w-2xl">
           <Tabs value={activeSection} onValueChange={setActiveSection}>
             <TabsContent value="general">
               <Card>
@@ -88,7 +88,7 @@ export function SettingsPage() {
                   <CardDescription>Manage your platform preferences</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="settings-row flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Theme</p>
                       <p className="text-xs text-[var(--text-secondary)]">Toggle between dark and light mode</p>
@@ -126,7 +126,7 @@ export function SettingsPage() {
                     { label: 'Deployment Health Alerts', desc: 'When deployments succeed or fail' },
                     { label: 'Billing & Usage Alerts', desc: 'When credits are running low' },
                   ].map(item => (
-                    <div key={item.label} className="flex items-center justify-between">
+                    <div key={item.label} className="settings-row flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-[var(--text-primary)]">{item.label}</p>
                         <p className="text-xs text-[var(--text-secondary)]">{item.desc}</p>
@@ -145,7 +145,7 @@ export function SettingsPage() {
                   <CardDescription>Manage your account security</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
-                  <div className="flex items-center justify-between">
+                  <div className="settings-row flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Two-Factor Authentication</p>
                       <p className="text-xs text-[var(--text-secondary)]">Add an extra layer of security</p>
@@ -153,13 +153,13 @@ export function SettingsPage() {
                     <Switch />
                   </div>
                   <Separator />
-                  <div className="flex items-center justify-between">
+                  <div className="settings-row flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Session Timeout</p>
                       <p className="text-xs text-[var(--text-secondary)]">Auto-logout after inactivity</p>
                     </div>
                     <Select defaultValue="30m">
-                      <SelectTrigger className="w-[160px] h-9 text-xs">
+                      <SelectTrigger className="settings-session-select h-9 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -171,7 +171,7 @@ export function SettingsPage() {
                     </Select>
                   </div>
                   <Separator />
-                  <div className="flex items-center justify-between">
+                  <div className="settings-row flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Update Password</p>
                       <p className="text-xs text-[var(--text-secondary)]">Change your account password</p>
@@ -212,7 +212,7 @@ export function SettingsPage() {
                   <CardDescription>Manage your subscription and usage</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
-                  <div className="flex items-center justify-between">
+                  <div className="settings-row flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-[var(--text-primary)]">Current Plan</p>
                       <p className="text-xs text-[var(--text-secondary)]">Free Tier</p>
@@ -257,7 +257,7 @@ export function SettingsPage() {
 
             {/* Sign Out */}
             <div className="mt-8 pt-6 border-t border-[var(--border-primary)]">
-              <div className="flex items-center justify-between">
+              <div className="settings-row flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-[var(--text-primary)]">Sign Out</p>
                   <p className="text-xs text-[var(--text-secondary)]">Sign out of your account on this device</p>

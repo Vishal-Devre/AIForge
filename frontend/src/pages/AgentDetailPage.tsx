@@ -129,7 +129,7 @@ export function AgentDetailPage() {
       </button>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
           <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${statusBgColors[agent.status]}`}>
             <Bot className={`h-7 w-7 ${statusColors[agent.status]}`} />
@@ -160,7 +160,7 @@ export function AgentDetailPage() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => navigate(`/agents/${agent.id}/edit`)}>
             <Edit3 className="h-4 w-4 mr-1.5" /> Edit Agent
           </Button>
@@ -228,7 +228,7 @@ export function AgentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <span className="text-xs text-[var(--text-tertiary)]">Provider</span>
                   <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{providerLabel[agent.provider]}</p>
@@ -238,7 +238,7 @@ export function AgentDetailPage() {
                   <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5 font-mono">{agent.model}</p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <span className="text-xs text-[var(--text-tertiary)]">Temperature</span>
                   <p className="text-sm text-[var(--text-primary)] font-medium mt-0.5">{agent.temperature.toFixed(1)}</p>

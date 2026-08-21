@@ -67,7 +67,7 @@ export function ChatBot() {
     <>
       {/* Chat Panel */}
       <div className={cn(
-        'fixed bottom-20 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-[var(--bg-primary)]/95 backdrop-blur-xl border border-[var(--border-primary)] rounded-2xl shadow-2xl shadow-black/30 transition-all duration-300 ease-out overflow-hidden',
+        'chat-panel fixed bottom-20 right-6 z-50 backdrop-blur-xl border rounded-2xl shadow-2xl transition-all duration-300 ease-out overflow-hidden',
         isOpen
           ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
           : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
@@ -131,8 +131,8 @@ export function ChatBot() {
               placeholder="Ask anything..."
               className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none"
             />
-            <button
-              onClick={handleSend}
+          <button
+            onClick={handleSend}
               disabled={!input.trim()}
               className={cn(
                 'p-1.5 rounded-lg transition-all',
@@ -140,7 +140,7 @@ export function ChatBot() {
                   ? 'text-[var(--accent)] hover:bg-[var(--accent-light)]'
                   : 'text-[var(--text-tertiary)] cursor-not-allowed'
               )}
-            >
+          >
               <Send className="h-4 w-4" />
             </button>
           </div>
@@ -153,9 +153,10 @@ export function ChatBot() {
         className={cn(
           'fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 group cursor-pointer',
           isOpen
-            ? 'bg-[var(--bg-tertiary)] border border-[var(--border-primary)] hover:bg-[var(--border-primary)]'
-            : 'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] hover:shadow-[var(--shadow-accent)] hover:shadow-2xl hover:scale-105'
+            ? 'chat-toggle--open'
+            : 'chat-toggle--closed'
         )}
+        aria-label={isOpen ? 'Close AIForge assistant' : 'Open AIForge assistant'}
       >
         {isOpen ? (
           <X className="h-5 w-5 text-[var(--text-primary)]" />

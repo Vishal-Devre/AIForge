@@ -366,7 +366,7 @@ export function CreateAgentPage() {
                 <CardDescription>Review your settings before creating the agent</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs text-[var(--text-tertiary)]">Name</span>
                     <p className="text-sm font-medium text-[var(--text-primary)] mt-0.5">{name || 'Unnamed'}</p>
@@ -383,7 +383,7 @@ export function CreateAgentPage() {
                   </div>
                 )}
                 <Separator />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs text-[var(--text-tertiary)]">Temperature</span>
                     <p className="text-sm text-[var(--text-primary)] mt-0.5">{temperature.toFixed(1)}</p>
@@ -441,7 +441,7 @@ export function CreateAgentPage() {
       )}
 
       {/* Navigation buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
         <Button
           variant="outline"
           onClick={() => setStep(s => Math.max(1, s - 1))}

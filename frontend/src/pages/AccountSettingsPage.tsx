@@ -65,7 +65,7 @@ export function AccountSettingsPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="settings-row flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">Interface Theme</p>
               <p className="text-xs text-[var(--text-tertiary)]">Toggle between Light and Dark mode appearance</p>
@@ -96,7 +96,7 @@ export function AccountSettingsPage() {
             { title: 'Deployment Health Alerts', desc: 'Alerts when container deployments restart or exceed threshold limits' },
             { title: 'Billing & Usage Alerts', desc: 'Alerts when compute credits or monthly limits are near exhaustion' },
           ].map((n) => (
-            <div key={n.title} className="flex items-center justify-between">
+            <div key={n.title} className="settings-row flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[var(--text-primary)]">{n.title}</p>
                 <p className="text-xs text-[var(--text-tertiary)]">{n.desc}</p>
@@ -113,7 +113,7 @@ export function AccountSettingsPage() {
           <CardTitle className="text-red-400">Danger Zone</CardTitle>
           <CardDescription>Irreversible actions for your user account</CardDescription>
         </CardHeader>
-        <CardContent className="flex items-center justify-between">
+        <CardContent className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">Delete Account</p>
             <p className="text-xs text-[var(--text-tertiary)]">Permanently delete your account, agents, and deployments</p>
