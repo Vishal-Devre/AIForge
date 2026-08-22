@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { BarChart3, TrendingUp, Zap, Clock, DollarSign, Layers } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
-import { Button } from '@/lib/ui/button'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { SegmentedTabs } from '@/components/shared/SegmentedTabs'
 
 export function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('7d')
@@ -13,20 +13,20 @@ export function AnalyticsPage() {
       <PageHeader
         title="Analytics & Usage"
         description="Comprehensive insights into system performance, token usage, API traffic, and GPU utilization"
-      >
-        <div className="flex items-center gap-2">
-          {['24h', '7d', '30d', '90d'].map(range => (
-            <Button
-              key={range}
-              variant={timeRange === range ? 'primary' : 'outline'}
-              size="sm"
-              onClick={() => setTimeRange(range)}
-            >
-              {range.toUpperCase()}
-            </Button>
-          ))}
-        </div>
-      </PageHeader>
+        actions={
+          <SegmentedTabs
+            ariaLabel="Analytics time range"
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { value: '24h', label: '24H' },
+              { value: '7d', label: '7D' },
+              { value: '30d', label: '30D' },
+              { value: '90d', label: '90D' },
+            ]}
+          />
+        }
+      />
 
       {/* KPI Cards — real data not yet available */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

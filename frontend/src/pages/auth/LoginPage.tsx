@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Zap, Eye, EyeOff, Mail, ArrowRight, Sparkles, Bot, Cpu, Rocket } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
+import { supabase } from '@/lib/supabase'
 import { useToast } from '@/lib/ui/toast'
 import './LoginPage.css'
 
@@ -12,6 +13,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+  const [resetSent, setResetSent] = useState(false)
   const { login, loginWithOAuth, isAuthenticated } = useAuth()
   const { addToast } = useToast()
   const navigate = useNavigate()
@@ -33,10 +35,32 @@ export function LoginPage() {
       await login(email, password)
       addToast({ type: 'success', title: 'Welcome back', message: 'Successfully signed in' })
       navigate('/')
-    } catch {
-      addToast({ type: 'error', title: 'Authentication failed', message: 'Invalid credentials' })
+    } catch (error: any) {
+      // Surface the actual reason (wrong password vs unconfirmed email vs network down)
+      addToast({
+        type: 'error',
+        title: 'Sign in failed',
+        message: error?.message || 'Something went wrong. Please try again.',
+      })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      addToast({ type: 'error', title: 'Email required', message: 'Enter your email address above first, then click "Forgot password".' })
+      return
+    }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/',
+      })
+      if (error) throw error
+      setResetSent(true)
+      addToast({ type: 'success', title: 'Reset link sent', message: `Check ${email} for instructions to reset your password.` })
+    } catch (error: any) {
+      addToast({ type: 'error', title: 'Could not send reset link', message: error?.message || 'Please try again later.' })
     }
   }
 
@@ -144,8 +168,8 @@ export function LoginPage() {
               <div className="auth-field">
                 <div className="auth-label-row">
                   <label className="auth-label">Password</label>
-                  <button type="button" className="auth-forgot-link">
-                    Forgot password?
+                  <button type="button" className="auth-forgot-link" onClick={handleForgotPassword}>
+                    {resetSent ? 'Reset link sent ✓' : 'Forgot password?'}
                   </button>
                 </div>
                 <div className="auth-input-wrapper">

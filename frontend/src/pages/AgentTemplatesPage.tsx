@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Search, LayoutTemplate, Compass, Star } from 'lucide-react'
+import { LayoutTemplate, Compass, Star } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
-import { Input } from '@/lib/ui/input'
+import { SearchBar } from '@/components/shared/SearchBar'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
 
@@ -20,15 +20,13 @@ export function AgentTemplatesPage() {
       />
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-          <Input
-            placeholder="Search templates..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <SearchBar
+          className="w-full sm:w-72"
+          placeholder="Search templates..."
+          ariaLabel="Search templates"
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
         <div className="flex flex-wrap gap-2">
           {['all', 'featured', 'automation', 'creative', 'analysis'].map(cat => (
             <button

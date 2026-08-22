@@ -30,14 +30,20 @@ app.add_middleware(ExceptionHandlingMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
 
 # CORS configuration
+# Development allows any origin; every other environment is restricted to the
+# configured frontend origin so the SPA can actually call the API.
 if settings.APP_ENV == "development":
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    cors_allow_origins = ["*"]
+else:
+    cors_allow_origins = [origin.strip() for origin in settings.FRONTEND_URL.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_allow_origins,
+    allow_credentials=cors_allow_origins != ["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include Routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

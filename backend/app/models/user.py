@@ -10,6 +10,7 @@ from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.agent import Agent
+    from app.models.agent_template import AgentTemplate
 
 
 class UserRole(str, PyEnum):
@@ -84,3 +85,8 @@ class User(Base):
     # Collection of agents owned by this user.
     # The `agents` attribute provides access to all Agent instances belonging to this user.
     agents: Mapped[List["Agent"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+
+    # Collection of agent templates created by this user.
+    # No cascade: templates must survive account deletion (FK uses ON DELETE SET NULL),
+    # so SQLAlchemy must NOT orphan/delete them when a User is removed.
+    agent_templates: Mapped[List["AgentTemplate"]] = relationship(back_populates="owner")

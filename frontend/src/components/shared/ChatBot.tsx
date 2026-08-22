@@ -30,8 +30,9 @@ export function ChatBot() {
   }, [isOpen])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (!isOpen) return
+    messagesEndRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [messages, isOpen])
 
   const handleSend = () => {
     if (!input.trim()) return
@@ -53,6 +54,7 @@ export function ChatBot() {
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, assistantMsg])
+      inputRef.current?.focus()
     }, 800)
   }
 
@@ -67,7 +69,7 @@ export function ChatBot() {
     <>
       {/* Chat Panel */}
       <div className={cn(
-        'chat-panel fixed bottom-20 right-6 z-50 backdrop-blur-xl border rounded-2xl shadow-2xl transition-all duration-300 ease-out overflow-hidden',
+        'chat-panel fixed bottom-20 right-6 z-50 border rounded-2xl shadow-2xl transition-[opacity,transform] duration-200 ease-out overflow-hidden',
         isOpen
           ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
           : 'opacity-0 translate-y-4 scale-95 pointer-events-none'

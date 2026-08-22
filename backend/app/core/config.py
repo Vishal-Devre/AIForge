@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ADMIN_EMAIL: str
+
+    # Frontend origin allowed by CORS in non-development environments
+    FRONTEND_URL: str = "http://localhost:5173"
     
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 

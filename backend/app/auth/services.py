@@ -28,8 +28,9 @@ def get_or_create_user(
         should_be_superuser = email == settings.ADMIN_EMAIL
         if user.is_superuser != should_be_superuser:
             user.is_superuser = should_be_superuser
-            if should_be_superuser:
-                user.role = UserRole.ADMIN
+            # Keep the RBAC role symmetric with the superuser flag in both directions,
+            # otherwise demoted admins would keep ADMIN privileges forever.
+            user.role = UserRole.ADMIN if should_be_superuser else UserRole.CUSTOMER
             db.add(user)
             db.commit()
             db.refresh(user)

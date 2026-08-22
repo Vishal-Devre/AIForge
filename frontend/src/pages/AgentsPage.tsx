@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Bot, Plus, Search, MoreHorizontal, ExternalLink, Trash2, Globe,
+  Bot, Plus, MoreHorizontal, ExternalLink, Trash2, Globe,
   Clock, Star, ArrowUpDown, AlertCircle, Edit3,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
-import { Input } from '@/lib/ui/input'
+import { SearchBar } from '@/components/shared/SearchBar'
 import { Badge } from '@/lib/ui/badge'
 import { Separator } from '@/lib/ui/separator'
 import {
@@ -259,15 +259,13 @@ function MyAgentsTab() {
     <div className="space-y-6">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-          <Input
-            placeholder="Search agents..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <SearchBar
+          className="w-full sm:w-72"
+          placeholder="Search agents..."
+          ariaLabel="Search agents"
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
         <div className="flex items-center gap-2 flex-wrap">
           {/* Status filter chips */}
           {['all', 'DRAFT', 'READY', 'DEPLOYED', 'ARCHIVED'].map(f => (
@@ -414,15 +412,13 @@ function MarketplaceTab() {
 
   return (
     <div className="space-y-6">
-      <div className="relative w-full sm:w-72">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-        <Input
-          placeholder="Search marketplace..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      <SearchBar
+        className="w-full sm:w-72"
+        placeholder="Search marketplace..."
+        ariaLabel="Search marketplace"
+        value={searchQuery}
+        onChange={setSearchQuery}
+      />
 
       {/* Loading */}
       {loading && (

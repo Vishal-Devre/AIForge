@@ -695,7 +695,6 @@ export function Sidebar() {
             left-0
             z-40
             h-screen
-            backdrop-blur-xl
             border-r
             flex
             flex-col

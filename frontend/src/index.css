@@ -372,7 +372,7 @@ html.dark .sidebar-surface {
 
 .app-top-navbar {
   border-color: var(--border-primary);
-  background-color: color-mix(in srgb, var(--bg-primary) 86%, transparent);
+  background-color: var(--bg-primary);
 }
 
 .page-header-title,

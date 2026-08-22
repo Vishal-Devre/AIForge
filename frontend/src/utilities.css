@@ -1829,3 +1829,11 @@
 /* ---- Image Additions ---- */
 .object-cover { object-fit: cover; }
 
+/* ---- Additional Responsive Widths ---- */
+@media (min-width: 768px) {
+  .md\:w-64 {
+    width: 16rem;
+  }
+}
+
+

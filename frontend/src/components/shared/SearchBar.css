@@ -1,0 +1,99 @@
+/* SearchBar — scoped styles using AIForge theme tokens (auto light/dark) */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-muted);
+  transition: background-color 150ms ease;
+}
+
+/* No border/outline change on click — subtle background shift only */
+.search-bar:focus-within {
+  border-color: var(--border-primary);
+  background-color: var(--bg-secondary);
+}
+
+.search-bar--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-bar-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.search-bar-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: -2px;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.search-bar-icon-btn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.search-bar-icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-bar-icon-btn:disabled {
+  cursor: not-allowed;
+}
+
+.search-bar-input {
+  flex: 1 1 0%;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--text-primary);
+}
+
+.search-bar-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Kill any browser-default border/outline/ring when focused */
+.search-bar-input:focus,
+.search-bar-input:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Hide native webkit clear/decoration for a consistent look */
+.search-bar-input::-webkit-search-cancel-button,
+.search-bar-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.search-bar-input:disabled {
+  cursor: not-allowed;
+}

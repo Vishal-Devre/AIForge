@@ -42,7 +42,16 @@ export function RegisterPage() {
     }
     setLoading(true)
     try {
-      await register(email, password, name)
+      const { needsEmailConfirmation } = await register(email, password, name)
+      if (needsEmailConfirmation) {
+        addToast({
+          type: 'success',
+          title: 'Almost there!',
+          message: 'Check your inbox and confirm your email address to activate your account.',
+        })
+        navigate('/login')
+        return
+      }
       addToast({ type: 'success', title: 'Account created', message: 'Welcome to AIForge!' })
       navigate('/')
     } catch (error: any) {

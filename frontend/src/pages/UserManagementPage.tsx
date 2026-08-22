@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Users, Search, ShieldCheck, Shield, CheckCircle2, XCircle, AlertCircle, RefreshCw } from 'lucide-react'
+import { Users, ShieldCheck, Shield, CheckCircle2, XCircle, AlertCircle, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/ui/card'
 import { Button } from '@/lib/ui/button'
-import { Input } from '@/lib/ui/input'
+import { SearchBar } from '@/components/shared/SearchBar'
+import { SegmentedTabs } from '@/components/shared/SegmentedTabs'
 import { Badge } from '@/lib/ui/badge'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { usersApi } from '@/lib/api'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/lib/ui/select'
 import type { AdminUser, UserStats } from '@/types'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -43,11 +43,17 @@ export function UserManagementPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
 
+  // Debounce server-side search so typing doesn't refetch on every keystroke
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(query), 350)
+    return () => clearTimeout(t)
+  }, [query])
+
   const fetchUsers = useCallback(async () => {
-    setLoading(true)
     setError(null)
     try {
       const [usersRes, statsRes] = await Promise.all([
@@ -59,6 +65,8 @@ export function UserManagementPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load users')
     } finally {
+      // Only the initial load shows the full-page skeleton; refreshes keep
+      // existing content mounted so the page never blanks while typing.
       setLoading(false)
     }
   }, [search, roleFilter])
@@ -182,26 +190,24 @@ export function UserManagementPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-                    <Input
-                      placeholder="Search by name or email..."
-                      value={search}
-                      onChange={e => setSearch(e.target.value)}
-                      className="pl-9 text-xs"
-                    />
-                  </div>
+                  <SearchBar
+                    className="w-full md:w-64"
+                    placeholder="Search by name or email..."
+                    ariaLabel="Search users"
+                    value={query}
+                    onChange={setQuery}
+                  />
 
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-[130px] h-9 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">All Roles</SelectItem>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="CUSTOMER">Customer</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <SegmentedTabs
+                    ariaLabel="Filter by role"
+                    value={roleFilter}
+                    onChange={setRoleFilter}
+                    options={[
+                      { value: 'ALL', label: 'All' },
+                      { value: 'ADMIN', label: 'Admins' },
+                      { value: 'CUSTOMER', label: 'Customers' },
+                    ]}
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -210,9 +216,9 @@ export function UserManagementPage() {
               {filteredUsers.length === 0 ? (
                 <EmptyState
                   icon={<Users className="h-8 w-8" />}
-                  title={search || roleFilter !== 'ALL' ? 'No matching users' : 'No users found'}
+                  title={query || roleFilter !== 'ALL' ? 'No matching users' : 'No users found'}
                   description={
-                    search || roleFilter !== 'ALL'
+                    query || roleFilter !== 'ALL'
                       ? 'Try adjusting your search or filters.'
                       : 'No users have registered yet.'
                   }
