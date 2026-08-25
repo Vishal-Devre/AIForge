@@ -10,7 +10,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions, className }: PageHeaderProps) {
   return (
-    <div className={cn('page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8', className)}>
+    <div className={cn('page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4', className)}>
       <div>
         <h1 className="page-header-title text-2xl md:text-3xl font-bold tracking-tight">{title}</h1>
         {description && (

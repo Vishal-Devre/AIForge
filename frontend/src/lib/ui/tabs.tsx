@@ -11,7 +11,7 @@ const TabsList = forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'ui-tabs-list inline-flex h-10 items-center justify-center rounded-lg p-1',
+      'ui-tabs-list inline-flex h-10 items-center rounded-[var(--radius-control)] border border-[var(--border-secondary)] p-1',
       className,
     )}
     {...props}
@@ -41,7 +41,7 @@ const TabsContent = forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      'mt-3 ui-tabs-content focus-visible:outline-none',
+      'mt-5 ui-tabs-content focus-visible:outline-none', /* 20px deliberate gap below tab row */
       className,
     )}
     {...props}

@@ -128,8 +128,7 @@ export function Sidebar() {
 
   const isCompact = !isMobile && desktopCollapsed;
   const isExpanded = !isCompact;
-  const sidebarWidth = isMobile ? "w-72" : isExpanded ? "w-60" : "w-[68px]";
-  const navSections = ["Workspace", "Administration"] as const;
+  const sidebarWidth = isMobile ? "w-60" : isExpanded ? "w-60" : "w-[68px]";
 
   // ------------------------------------------------------------
   // SIDEBAR CONTENT
@@ -290,15 +289,11 @@ export function Sidebar() {
               </div>
 
               <div className="flex flex-col min-w-0">
-                <span
-                  className="sidebar-brand-name text-sm font-bold tracking-tight"
-                >
+                <span className="sidebar-brand-name text-sm font-bold tracking-tight">
                   AIForge
                 </span>
 
-                <span
-                  className="sidebar-brand-subtitle text-[10px] font-medium"
-                >
+                <span className="sidebar-brand-subtitle text-[10px] font-medium">
                   AI Platform
                 </span>
               </div>
@@ -336,94 +331,54 @@ export function Sidebar() {
           NAVIGATION
           ====================================================== */}
 
-      <nav className="flex-1 py-4 px-2 overflow-y-auto" aria-label="Primary navigation">
-        {navSections.map((section) => {
-          const items = filteredItems.filter((item) => item.section === section);
-          if (items.length === 0) return null;
+      <nav
+        className="flex-1 py-2 px-3 overflow-y-auto space-y-0.5"
+        aria-label="Primary navigation"
+      >
+        {filteredItems
+          .filter(
+            (item) =>
+              item.label !== "Platform Settings" &&
+              item.label !== "Account settings",
+          )
+          .map((item) => {
+            const Icon = iconMap[item.icon] || LayoutDashboard;
+            const active = isActive(item.path);
 
-          return (
-            <div key={section} className="mb-5 last:mb-0">
-              {!isCompact && (
-                <p className="sidebar-section-label px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                  {section}
-                </p>
-              )}
-              <div className="space-y-1">
-                {items.map((item) => {
-          const Icon = iconMap[item.icon] || LayoutDashboard;
-
-          const active = isActive(item.path);
-
-          return (
-            <div key={item.path}>
-              <SidebarTooltip label={item.label} enabled={isCompact}>
-              <button
-                type="button"
-                onClick={() => handleNavigate(item.path)}
-                className={cn(
-                  `
-                    w-full
-                    flex
-                    items-center
-                    gap-3
-                    px-3
-                    py-2.5
-                    rounded-xl
-                    text-sm
-                    font-medium
-                    transition-all
-                    duration-200
-                    group
-                    relative
-                    border
-                    cursor-pointer
-                  `,
-
-                  !isExpanded && "justify-center px-2",
-
-                  active ? "sidebar-btn-active" : "sidebar-btn-default",
-                )}
+            return (
+              <SidebarTooltip
+                key={item.path}
+                label={item.label}
+                enabled={isCompact}
               >
-                <Icon
+                <button
+                  type="button"
+                  onClick={() => handleNavigate(item.path)}
                   className={cn(
                     `
-                      h-4.5
-                      w-4.5
-                      shrink-0
-                      transition-colors
-                      sidebar-icon
+                      w-full
+                      flex
+                      items-center
+                      gap-3
+                      px-3
+                      py-2.5
+                      rounded-xl
+                      text-sm
+                      font-medium
+                      transition-all
+                      duration-200
+                      cursor-pointer
                     `,
-
+                    !isExpanded && "justify-center px-2",
+                    active ? "sidebar-btn-active" : "sidebar-btn-default",
                   )}
-                />
-
-                {isExpanded && <span className="truncate">{item.label}</span>}
-
-                {active && isExpanded && (
-                  <span
-                    className="
-                        absolute
-                        left-0
-                        top-1/2
-                        -translate-y-1/2
-                        w-0.5
-                        h-5
-                        rounded-full
-                        bg-accent
-                        shadow-sm
-                      "
-                  />
-                )}
-              </button>
-
+                >
+                  <Icon className="h-4.5 w-4.5 shrink-0 sidebar-icon" />
+                  {isExpanded && <span className="truncate">{item.label}</span>}
+                </button>
               </SidebarTooltip>
-            </div>
-          );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </nav>
 
       {/* ======================================================
@@ -432,47 +387,60 @@ export function Sidebar() {
 
       <div
         className={cn(
-          `
-            px-3
-            py-3
-            border-t
-            space-y-1
-          `,
-
+          "px-3 pb-3 pt-2 space-y-0.5",
           "sidebar-footer",
-
           isCompact && "px-2",
         )}
       >
-        {/* ====================================================
-            USER PROFILE
-            ==================================================== */}
-
-        {isAuthenticated && user ? (
-          <>
-          <SidebarTooltip label="Account settings" enabled={isCompact}>
+        {filteredItems.find((i) => i.label === "Platform Settings") && (
+          <SidebarTooltip label="Platform Settings" enabled={isCompact}>
             <button
               type="button"
-              onClick={() => handleNavigate("/account")}
+              onClick={() => handleNavigate("/settings")}
               className={cn(
                 `
                   w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                  transition-all duration-200 border cursor-pointer
+                  transition-all duration-200 cursor-pointer
                 `,
-                isCompact && "justify-center px-2",
-                "sidebar-btn-default",
+                !isExpanded && "justify-center px-2",
+                isActive("/settings")
+                  ? "sidebar-btn-active"
+                  : "sidebar-btn-default",
               )}
             >
-              <Settings className="h-4.5 w-4.5 shrink-0 sidebar-icon" />
-              {isExpanded && <span>Account settings</span>}
+              <Sliders className="h-4.5 w-4.5 shrink-0 sidebar-icon" />
+              {isExpanded && <span>Platform Settings</span>}
             </button>
           </SidebarTooltip>
-          <SidebarTooltip label="Profile" enabled={isCompact}>
-          <button
-            type="button"
-            onClick={() => handleNavigate("/profile")}
-            className={cn(
-              `
+        )}
+
+        {isAuthenticated && user ? (
+          <>
+            <SidebarTooltip label="Account settings" enabled={isCompact}>
+              <button
+                type="button"
+                onClick={() => handleNavigate("/account")}
+                className={cn(
+                  `
+                  w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                  transition-all duration-200 cursor-pointer
+                `,
+                  !isExpanded && "justify-center px-2",
+                  isActive("/account")
+                    ? "sidebar-btn-active"
+                    : "sidebar-btn-default",
+                )}
+              >
+                <Settings className="h-4.5 w-4.5 shrink-0 sidebar-icon" />
+                {isExpanded && <span>Account settings</span>}
+              </button>
+            </SidebarTooltip>
+            <SidebarTooltip label="Profile" enabled={isCompact}>
+              <button
+                type="button"
+                onClick={() => handleNavigate("/profile")}
+                className={cn(
+                  `
                 w-full
                 flex
                 items-center
@@ -486,17 +454,17 @@ export function Sidebar() {
                 duration-200
                 group
                 relative
-                border
                 cursor-pointer
               `,
-
-              !isExpanded && "justify-center px-2",
-              "sidebar-btn-default",
-            )}
-          >
-            {/* Avatar */}
-            <div
-              className="
+                  !isExpanded && "justify-center px-2",
+                  isActive("/profile")
+                    ? "sidebar-btn-active"
+                    : "sidebar-btn-default",
+                )}
+              >
+                {/* Avatar */}
+                <div
+                  className="
                 sidebar-avatar
                 h-10
                 w-10
@@ -509,59 +477,59 @@ export function Sidebar() {
                 shrink-0
                 overflow-hidden
               "
-            >
-              {user.avatar_url ? (
-                <img
-                  src={user.avatar_url}
-                  alt={user.full_name}
-                  className="
+                >
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt={user.full_name}
+                      className="
                     h-full
                     w-full
                     object-cover
                   "
-                />
-              ) : user.full_name ? (
-                user.full_name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase()
-              ) : (
-                "U"
-              )}
-            </div>
+                    />
+                  ) : user.full_name ? (
+                    user.full_name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .substring(0, 2)
+                      .toUpperCase()
+                  ) : (
+                    "U"
+                  )}
+                </div>
 
-            {isExpanded && (
-              <div className="flex-1 min-w-0 text-left">
-                <p
-                  className={cn(
-                    `
+                {isExpanded && (
+                  <div className="flex-1 min-w-0 text-left">
+                    <p
+                      className={cn(
+                        `
                       text-sm
                       font-medium
                       truncate
                     `,
-                    "sidebar-profile-name",
-                  )}
-                >
-                  {user.full_name}
-                </p>
+                        "sidebar-profile-name",
+                      )}
+                    >
+                      {user.full_name}
+                    </p>
 
-                <p
-                  className={cn(
-                    `
+                    <p
+                      className={cn(
+                        `
                       text-[10px]
                       truncate
                     `,
-                    "sidebar-profile-email",
-                  )}
-                >
-                  {user.email}
-                </p>
-              </div>
-            )}
-          </button>
-          </SidebarTooltip>
+                        "sidebar-profile-email",
+                      )}
+                    >
+                      {user.email}
+                    </p>
+                  </div>
+                )}
+              </button>
+            </SidebarTooltip>
           </>
         ) : (
           /* ==================================================
@@ -569,11 +537,11 @@ export function Sidebar() {
              ================================================== */
 
           <SidebarTooltip label="Sign in" enabled={isCompact}>
-          <button
-            type="button"
-            onClick={() => handleNavigate("/login")}
-            className={cn(
-              `
+            <button
+              type="button"
+              onClick={() => handleNavigate("/login")}
+              className={cn(
+                `
                 w-full
                 flex
                 items-center
@@ -584,18 +552,15 @@ export function Sidebar() {
                 text-sm
                 font-medium
                 transition-all
-                border
                 cursor-pointer
               `,
-
-              isCompact && "justify-center px-2",
-
-              "sidebar-btn-default",
-            )}
-          >
-            <div
-              className={cn(
-                `
+                isCompact && "justify-center px-2",
+                "sidebar-btn-default",
+              )}
+            >
+              <div
+                className={cn(
+                  `
                   h-8
                   w-8
                   rounded-full
@@ -603,22 +568,15 @@ export function Sidebar() {
                   items-center
                   justify-center
                   shrink-0
-                  border
                 `,
-
-                "sidebar-sign-in-icon",
-              )}
-            >
-              <LogIn
-                className={cn(
-                  "h-4 w-4",
-                  "sidebar-icon",
+                  "sidebar-sign-in-icon",
                 )}
-              />
-            </div>
+              >
+                <LogIn className={cn("h-4 w-4", "sidebar-icon")} />
+              </div>
 
-            {isExpanded && <span>Sign in</span>}
-          </button>
+              {isExpanded && <span>Sign in</span>}
+            </button>
           </SidebarTooltip>
         )}
       </div>
@@ -691,25 +649,28 @@ export function Sidebar() {
         className={cn(
           `
             fixed
-            top-0
-            left-0
+            top-3
+            bottom-3
+            left-3
             z-40
-            h-screen
-            border-r
+            rounded-2xl
+            border
+            border-[var(--border-secondary)]
+            shadow-sm
             flex
             flex-col
             transition-all
             duration-200
             ease-in-out
+            overflow-hidden
           `,
-
           "sidebar-surface",
-
+          "shrink-0",
           sidebarWidth,
-
-          "md:relative",
-
-          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+          "md:static md:my-3 md:ml-3 md:mr-4",
+          mobileOpen
+            ? "translate-x-0 shadow-2xl"
+            : "-translate-x-[110%] md:translate-x-0",
         )}
       >
         {sidebarContent}
